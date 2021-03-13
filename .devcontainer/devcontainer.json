@@ -21,7 +21,8 @@
 		"dbaeumer.vscode-eslint",
 		"hiro-sun.vscode-emacs",
 		"bierner.github-markdown-preview",
-		"eamodio.gitlens"
+		"eamodio.gitlens",
+		"orta.vscode-jest"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
