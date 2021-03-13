@@ -5,23 +5,7 @@ This provides more flexibility for working with [ObservableHQ's](https://observa
 Virtualization also allows for supplying alternate sources for the data, and dynamic updates to the data. The AsyncGenerator paradigm is used to allow dynamic updates while allowing proper updating of dependencies.
 
 # Features
-* Simple starting point.
-* Full typescript integration
-  * Generated Javascript files and source are placed in lib/ for easy cleanup and less clutter.
-  * Javascript configuration files redirect to typescript ones in [./config](config/README.md) .
-  * Typescript build tools are fully supported in-project.
-* Great experience out-of-the-box.
-  * Extensive descriptions of project structure
-  * Descriptions of plugins and options.
-  * A buildable, testable environment out-of-the-box
-  * Clear path to adding additional features
-* Updates and optional features can be flexibliy merged in via git merges.
-  * Regular update scripts break when you make customizations.
-  * Git merges, at worst, give merge conflicts.
-  * Merge conflicts lay out what change was being attempted and why there was a conflict.
-  * Because you have the context for why your change conflicts, it's easier to resolve.
-  * The usual fallback for script-based template configuration is to manually figure out and make the changes.
- * [Continuous Integration Integration](#continuous-integration-integration)
+
 
 # Content
 
