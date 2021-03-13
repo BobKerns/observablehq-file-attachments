@@ -27,7 +27,7 @@ const traverse = <T>(filesystem: AFileSystem, path: string, tree: Tree, visitor:
         } else if (rest.length === 0) {
             // We're at the end of the path, so this names the file.
             const [name, versionName] = head.split('@');
-            
+
             let files = asFiles(tree[name]);
             if (!files) {
                 files = await tree[FILE]?.(filesystem, path, name, versionName, rest, tree)
@@ -43,7 +43,7 @@ const traverse = <T>(filesystem: AFileSystem, path: string, tree: Tree, visitor:
         } else {
             let ntree = asTree(tree[head]);
             if (!ntree) {
-                ntree = await tree[DIRECTORY]?.(filesystem, path, head, rest, tree) 
+                ntree = await tree[DIRECTORY]?.(filesystem, path, head, rest, tree)
                     ?? await createDirectory(filesystem, path, head, rest, tree)
                     ?? null
                 if (ntree) {
@@ -53,7 +53,7 @@ const traverse = <T>(filesystem: AFileSystem, path: string, tree: Tree, visitor:
             directoryAction(path, head, tree)
             return recurse(rest, ntree);
         }
-    };  
+    };
     return recurse(path.split('/'), tree);
 };
 
@@ -66,7 +66,21 @@ const errorWrapper = (fs: AFileSystem, op: string, ...args: any[]) => <F extends
     }
 };
 
-// The actual class that implements all this.
+/**
+ * The `AFileSystem` constructor takes a single argument, which represents an initial filesystem content.
+ *
+ * Every Object (not subclasses, but literal objects) represent a directory,
+ * while every array holds the versions of a logical file.
+ *
+ * Versions are specified on lookup by appending _@version_ to the path. No version
+ * specified is the same as `@latest`, which obtains the highest numbered version
+ * (the last in the array). You can ignore named versions (labels), or even multiple
+ * versions, but files are always identified by being in an array.
+ *
+ * A file can be any value, but normally they will be either an
+ * [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or an
+ * [AFile](#AFile); they implement the same interface
+ */
 export class AFileSystem implements Regenerable {
     readOnly: boolean;
     name: string;

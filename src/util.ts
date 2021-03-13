@@ -4,7 +4,7 @@
 
 import { is } from "ramda";
 import { METADATA, TAGS } from "./symbols";
-import { FileAttachment, Files, Tree, Version, VFile } from "./types";
+import { FileAttachment, Files, Metadata, Tree, Version, VFile } from "./types";
 
 /**
  * like 'throw', but a function rather than a statement.
@@ -127,3 +127,12 @@ export const encodeString = (s: string) => {
     }
     return ab;
   };
+
+  /**
+   * Associate a _metadata_ object with the specified file (or array of file
+   * versions). This is normally used to annotate entries in the
+   * [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
+   * tree.
+   */
+export const meta = <T>(obj: T, metadata: Metadata) =>
+   obj && Object.defineProperty(obj, METADATA, { value: metadata });

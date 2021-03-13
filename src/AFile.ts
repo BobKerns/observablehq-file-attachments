@@ -4,7 +4,27 @@ import { Metadata } from './types';
 import { encodeString } from './util';
 import {fromByteArray} from 'base64-js';
 
-
+/**
+ * `new AFile(`_name_, _data_, _metadata_`)`
+ *
+ * This implements the same interface as [FileAttachment](https://observablehq.com/@observablehq/file-attachments), but works with supplied data in a variety of forms:
+ * * String—depending on the type requested, this may involve parsing or converting to an ArrayBuffer, Blob, or ReadableStream. _options_ arguments to the various extractors can include `{utf8: _false_}` to use UTF16 rather than UTF8 encoding.
+ * * ArrayBuffer
+ * * ReadableStream
+ * * Blob
+ * * JSON-compatible objects
+ * * Arrays such as would be returned from `.csv()` or `.tsv()`. Non-arrays will be converted to strings and parsed.
+ * * A function. returning the value or a promise to the value. This is the most useful form, as it defers computation until needed. Except in the case of a `ReadableStream`, the result is cached. The function is called with the following arguments:
+ *     * _file_: the [AFile](#AFile).
+ *     * _method_: One of `json`, `text`. `arrayBuffer`, `stream`, `url`, `csv`, `tsv`. These indicate how the data will be used, allowing the function to choose how to represent it. the usual conversions will be applied as needed, however, so it may be safely ignored.
+ *     * _options_: The options supplied to the method accessing the data.
+ * * Arbitrary data not described above, which can be retrieved unchanged via the `.json()` method
+ * * A `Promise` that resolves to any of the above.
+ *
+ * _metadata_ is either an object with metadata to be combined, or a string, which is interpreted as the `contentType`, as a shorthand when that is the only metadata being supplied.
+ *
+ * All operations are asynchronous.
+ */
 export class AFile {
     [METADATA]: Metadata;
     [CACHED_METADATA]: Metadata;
@@ -124,7 +144,7 @@ export class AFile {
         const str = fromByteArray(arr)
         return `data:${mime};base64,${str}`;
     }
-    
+
     async arrayBuffer(opts = { utf8: true }) {
         const { utf8 = true } = opts;
         const data = await this.getData('arrayBuffer', opts);
@@ -182,4 +202,3 @@ export class AFile {
 function dsv(arg0: string, arg1: string, opts: { utf8: boolean; }) {
     throw new Error('Function not implemented.');
 }
-    
