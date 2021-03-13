@@ -1,6 +1,6 @@
 {
   "exclude": "**/__tests__/**",
-  "name": "NPM Template Project (rename me!)",
+  "name": "ObservableHQ FileAttachment Virtual Filesystem",
   "readme": "src/README.md",
   "includes": "./"
 }
