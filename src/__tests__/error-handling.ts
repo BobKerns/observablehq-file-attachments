@@ -1,5 +1,4 @@
 /*
- * @NpmRollupTemplate
  * Copyright 2020 by Bob Kerns. Licensed under MIT license.
  *
  * Github: https://github.com/BobKerns/npm-rollup-typescript-template
@@ -15,10 +14,10 @@ describe("Verify handling stack traces correctly.", () => {
            //
            //
            // noinspection ExceptionCaughtLocallyJS
-           throw new Error("E"); // This must be line 18.
+           throw new Error("E"); // This must be line 17.
        } catch (e) {
            expect(e.message).toBe("E");
-           expect(e.stack).toMatch(/[/\\]error-handling.ts[^a-zA-Z0-9]+18/m);
+           expect(e.stack).toMatch(/[/\\]error-handling.ts[^a-zA-Z0-9]+17/m);
        }
    })
 });
