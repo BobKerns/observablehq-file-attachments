@@ -33,6 +33,13 @@ export class AFile {
     ['content-type']: string;
     #dataResult: any;
     #noCache: boolean = false;
+
+    /**
+     * Construct a new [[AFile]]
+     * @param name Name of the file
+     * @param data Data for the file. It will be converted as needed.
+     * @param metadata Optional metadata for the file.
+     */
     constructor(name: string, data: any, metadata: Partial<Metadata> = {}) {
         // Allow specifying the contentType by just giving the mime type.
         if (typeof metadata === 'string') {
@@ -55,6 +62,12 @@ export class AFile {
         this[METADATA].contenttype = contentType;
     }
 
+    /**
+     * Internal method.
+     * @param type Method that is requesting the data, to handle any prepatory conversions needed
+     * @param opts Any options passed to the original method
+     * @returns A `Promise` resolving to the data in the requested form.
+     */
     async getData(type: string, opts: any) {
         let data = await ((!this.#noCache && this.#dataResult) || this.data);
         if (typeof data === 'function') {
@@ -96,6 +109,11 @@ export class AFile {
         return data;
     }
 
+    /**
+     * Return the data as JSON (as a Promise)
+     * @param opts Options. The valid option is `utf8`, which defaults to true
+     * @returns A `Promise` that resolves to a JSON value.
+     */
     async json(opts = { utf8: true }) {
         const data = await this.getData('json', opts);
         if (
@@ -108,6 +126,11 @@ export class AFile {
         return data;
     }
 
+    /**
+     * Return the data as a string.
+     * @param opts Options. The valid option is `utf8`, which defaults to true
+     * @returns A `Promise` that resolves to a text string.
+     */
     async text(opts = { utf8: true }) {
         const { utf8 = true } = opts;
         const data = await this.getData('text', opts);
@@ -133,6 +156,11 @@ export class AFile {
         return JSON.stringify(data);
     }
 
+    /**
+     * Obtain a data URL with the data.
+     * @param opts Options. The valid option is `utf8`, which defaults to true
+     * @returns A `Promise` that resolves to a data URL with the data.
+     */
     async url(opts = { utf8: true }) {
         const data = await this.getData('url', opts);
         const mime = this?.['content-type'];
@@ -145,6 +173,11 @@ export class AFile {
         return `data:${mime};base64,${str}`;
     }
 
+    /**
+     * Return the data in an `ArrayBuffer` backed with a byte array.
+     * @param opts Options. The valid option is `utf8`, which defaults to true
+     * @returns A `Promise` which resolves to an array buffer with the data
+     */
     async arrayBuffer(opts = { utf8: true }) {
         const { utf8 = true } = opts;
         const data = await this.getData('arrayBuffer', opts);
@@ -161,6 +194,11 @@ export class AFile {
         }
     }
 
+    /**
+     * Return the data in the form of a `Blob`
+     * @param opts Options. The valid option is `utf8`, which defaults to true
+     * @returns A `Promise` that resolves to a `Blob`
+     */
     async blob(opts: any = {utf8: true}) {
         const data = await this.getData('blob', opts);
         if (data instanceof Blob) {
@@ -169,6 +207,11 @@ export class AFile {
         return new Blob([new Uint8Array(await this.arrayBuffer(opts))]);
     }
 
+    /**
+     * Interpret the data as CSV text. Uses D3's CSV/TSV parser.
+     * @param opts Options. The valid option is `utf8`, which defaults to true
+     * @returns A `Promise` which returns the data parsed as CSV
+     */
     async csv(opts = { utf8: true }) {
         const data = await this.getData('csv', opts);
         if (Array.isArray(data)) return data;
@@ -176,6 +219,11 @@ export class AFile {
         return dsv(await this.text(), ",", opts);
     }
 
+    /**
+     * Interpret the data as TSV text. Uses D3's CSV/TSV parser.
+     * @param opts Options. The valid option is `utf8`, which defaults to true
+     * @returns A `Promise` which returns the data parsed as TSV
+     */
     async tsv(opts = { utf8: true }) {
         const data = await this.getData('tsv', opts);
         if (Array.isArray(data)) return data;

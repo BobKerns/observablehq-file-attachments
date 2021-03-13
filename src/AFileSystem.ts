@@ -89,6 +89,12 @@ export class AFileSystem implements Regenerable {
     updateCount: number;
     errored: (e: Error) => void;
     updated: (n: this) => void;
+
+    /**
+     *
+     * @param tree The specification of what directories and files to initialize the filesystem with
+     * @param options Optional options: _readOnly_ and _name_
+     */
     constructor(tree: Tree, options: {readOnly?: boolean, name?: string} = {}) {
         const {readOnly, name} = options;
         this.readOnly = !!readOnly;
@@ -100,7 +106,14 @@ export class AFileSystem implements Regenerable {
         this.errored = () => undefined;
         this.updated = () => undefined;
     }
-    // Find the requested path.
+
+    /**
+     * Find the file at the given (possibly versioned) path.
+     *
+     * @param path the full pathname to the desired file
+     * @returns A promise to a [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or
+     *      [AFile](#AFile), or `null` if no file is found at that path.
+     */
     find(path: string) {
         return errorWrapper(this, 'find', path)(() => {
             const getFile = (path: string, name: string, version: Version, files: Files): VFile | null => {
@@ -118,8 +131,12 @@ export class AFileSystem implements Regenerable {
         })
     }
 
-    // Wait for the requested path. The return value is an async generator
-    // that yields once when the requested path is available.
+    /**
+     * Wait for the requested path. The return value is an async generator
+     *  that yields when the requested path is available.
+     * @param path Path to the file
+     * @returns An async generator yielding a value for the file when it becomes available..
+     */
     async *waitFor(path: string) {
         let v = this.find(path);
         if (v) {
@@ -136,8 +153,13 @@ export class AFileSystem implements Regenerable {
         }
     }
 
-    // Wait for the requested path. The return value is an async generator
-    // that yields once for each value stored at path.
+    /**
+     * Wait for the requested path. The return value is an async generator
+     * that yields once for each value stored at path.
+     * @param path Path to the file
+     * @param nullOK if true, `null` will be returned by the generator whenever the file does not exist; by default it is filtered out.
+     * @returns An async generator yielding values for a file as it changes (new versions created/deleted).
+     */
     async *watch(path: string, nullOK = false) {
         let v = this.find(path);
         if (v || nullOK) {
@@ -154,8 +176,12 @@ export class AFileSystem implements Regenerable {
         }
     }
 
-    // Return the metadata for the requested path.
-    async metadata(path: string) {
+    /**
+     * Return the metadata for the requested path.
+     * @param path Path to the file
+     * @returns Promise yielding Metadata or `null` if the file is not found.
+     */
+    async metadata(path: string): Promise<Metadata | null> {
         return errorWrapper(this, 'metadata', path)(() => {
             const getMeta = async (path: string, name: string, version: Version,
                                    files: Files): Promise<Metadata | null> => {
@@ -196,8 +222,13 @@ export class AFileSystem implements Regenerable {
         });
     }
 
-    // Add a new file at the specified path. If no version, or 'latest', adds a new version.
-    // Otherwise sets the specified version or label.
+    /**
+     * Add a new file at the specified path. If no version, or 'latest', adds a new version.
+     * Otherwise sets the specified version or label.
+     * @param path Path to store the file
+     * @param file The file, either an [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or an [[AFile]].
+     * @returns the file
+     */
     add(path: string, file: VFile) {
         return errorWrapper(this, 'add', path, file)(() => {
             if (this.readOnly) throw new Error(`Read only filesystem.`);
@@ -215,24 +246,39 @@ export class AFileSystem implements Regenerable {
                 return traverse(this, path, this.tree, {file: setFile, createDirectory});
             } catch (e) {
                 this.errored(e);
-                return null;
+                throw e;
             } finally {
                 this.updated(this);
             }
         });
     }
 
-    // Copy file from to. If 'latest' or unspecified, copies only the latest.
+    /**
+     * Copy file from to. If 'latest' or unspecified, copies only the latest.
+     * @param from Path to the existing file
+     * @param to Path to the destination
+     * @returns the file copied
+     */
     copy(from: string, to: string) {
         return this.add(to, this.find(from));
     }
 
-    // Label the version at the specified path with 'label'.
+    /**
+     * Label the version at the specified path with 'label'.  A label selects a specific version of a file;
+     * it is not a property of a file version.
+     * @param path Path to the file
+     * @param label Label to add to the file
+     * @returns The file labeled.
+     */
     label(path: string, label: string) {
         const exp = path.split('/');
+        // Get the file name, stripping away the label or version if present.
         const end = exp[exp.length - 1].split('@')[0];
+        // Replace the exploded path with the name and the new label
         exp[exp.length - 1] = `${end}@${label}`;
+        // Turn it back into a path string
         const to = exp.join('/');
+        // And copy.
         return this.copy(path, to);
     }
 }
