@@ -12,6 +12,7 @@ Virtualization also allows for supplying alternate sources for the data, and dyn
 * Contents can be updated on on the fly.
 * The reactive control flow is preserved through the use of async generators.
 * Implements a versioned, tagged filesystem, facilitating comparing different versions of the same data.
+* Works smoothly with ObservableHQ's attachment usage tracking and renumbering on reupload.
 
 # Content
 
