@@ -1,6 +1,6 @@
 # Project ObservableHQ FileAttachment Virtual Filesystem
 
-This provides more flexibility for working with ObservableHQ's FileAttachment objects, by placing them in a virtual directory structure.
+This provides more flexibility for working with [ObservableHQ's](https://observablehq.com) FileAttachment objects, by placing them in a virtual directory structure.
 
 Virtualization also allows for supplying alternate sources for the data, and dynamic updates to the data. The AsyncGenerator paradigm is used to allow dynamic updates while allowing proper updating of dependencies.
 
