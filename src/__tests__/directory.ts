@@ -37,6 +37,14 @@ describe('AEFunction', () => {
             test('noslash empty in subdir', async () =>
                 expect(await sut.find('nodir/nofile'))
                     .toBeNull());
+
+            test('latest', async () =>
+                expect(await sut.find('nodir/nofile:latest'))
+                    .toBeNull());
+
+            test('earliest', async () =>
+                expect(await sut.find('nodir/nofile:earliest'))
+                    .toBeNull());
         });
         describe('simple', () => {
             const file1 = new AFile('file1', 'data1');
@@ -62,12 +70,25 @@ describe('AEFunction', () => {
             test('Deeper@latest', async () =>
                 expect(await sut.find('/subdir/deeper/versions@latest'))
                     .toBe(file2));
+            test('Deeper@earliest', async () =>
+                expect(await sut.find('/subdir/deeper/versions@earliest'))
+                    .toBe(file1));
             test('Deeper@2', async () =>
                 expect(await sut.find('/subdir/deeper/versions@2'))
                     .toBe(file2));
             test('Deeper@1', async () =>
                 expect(await sut.find('/subdir/deeper/versions@1'))
                     .toBe(file1));
+
+            test('Deeper@-1', async () =>
+                expect(await sut.find('/subdir/deeper/versions@-1'))
+                    .toBe(file2));
+            test('Deeper@-2', async () =>
+                expect(await sut.find('/subdir/deeper/versions@-2'))
+                    .toBe(file1));
+            test('Deeper@-3', async () =>
+                expect(await sut.find('/subdir/deeper/versions@-3'))
+                    .toBe(null));
         });
     });
 });

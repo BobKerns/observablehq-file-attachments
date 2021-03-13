@@ -93,7 +93,7 @@ const canonicalizeVersion = (version: Version | null | undefined, length: number
                 return 0;
         }
         // If a number passed as a string convert to a number.
-        if (/^\d+$/.test(version)) {
+        if (/^[-+]?\d+$/.test(version)) {
             return canonicalizeVersion(Number.parseInt(version, 10), length);
         }
         // Tag
