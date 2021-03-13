@@ -120,7 +120,7 @@ export class AFileSystem implements Regenerable {
                 if (files.constructor === Object) {
                     throw new Error(`${path} is a directory.`);
                 }
-                const file = files[version === -1 ? files.length - 1 : version as number];
+                const file = getVersion(files, version);
                 if (!file) return null;
                 if (Array.isArray(file) || file.constructor === Object) {
                     throw new Error(`${path} is a directory`);

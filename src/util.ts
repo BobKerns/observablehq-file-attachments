@@ -75,6 +75,43 @@ export const isFileAttachment = (a: any): a is FileAttachment =>
     && a.constructor !== Object;
 
 /**
+ * Canonicalize the version. Produces:
+ * * an index into the array
+ * * a string index into the [[TAGS]] object
+ * * `null`, if `0` version (state before any versions).
+ * @param version
+ * @param length the number of versions, to use for range checking and negative versions
+ * @returns a number, string, or `null`
+ */
+const canonicalizeVersion = (version: Version | null | undefined, length: number): Version | null => {
+    version = version ?? -1;
+    if (typeof version === 'string') {
+        switch (version) {
+            case 'latest':
+                return length - 1;
+            case 'earliest':
+                return 0;
+        }
+        // If a number passed as a string convert to a number.
+        if (/^\d+$/.test(version)) {
+            return canonicalizeVersion(Number.parseInt(version, 10), length);
+        }
+        // Tag
+        return version;
+    }
+    if (length === 0) return null;
+    version = version ?? -1;
+    if (version === 0) {
+        // The initial state is no file.
+        return null;
+    }
+    // Negative versions count from most recent.
+    return version < 0
+        ? length + version
+        : version - 1;
+}
+
+/**
  * Add a file at a specific version or label in a [[Files]] array.
  * This is an internal tool for implementing [[FILE]] handlers.
  * @param files The Files array
@@ -82,54 +119,34 @@ export const isFileAttachment = (a: any): a is FileAttachment =>
  * @returns void
  */
 export const getVersion = (files: Files, version: Version): VFile | null => {
-    if (typeof version === 'string') {
-        switch (version) {
-            case 'latest':
-                return files[files.length - 1];
-            case 'earliest':
-                return files[0];
-        }
-        // If a number passed as a string convert to a number.
-        if (/^\d+$/.test(version)) {
-            return getVersion(files, Number.parseInt(version, 10));
-        }
-        // Tag
-        return files?.[TAGS]?.[version] ?? null;
-    }
-    if (files.length === 0) return null;
-    return files[version === -1 ? files.length - 1 : version] ?? null;
+    const cVersion = canonicalizeVersion(version, files.length);
+    return cVersion === null
+        ? null
+        : typeof cVersion === 'string'
+            ? files[TAGS]?.[cVersion] ?? null
+            : files[cVersion] ?? null;
 };
 
 /**
  * Add a file at a specific version or label in a [[Files]] array.
  * This is an internal tool for implementing [[FILE]] handlers.
  * @param files The Files array
- * @param version The version to delete. Either a version number or a label
+ * @param version The version to set. Either a version number or a label
  * @param newFile The [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or [[AFile]]
  * @returns void
  */
 export const setVersion = (files: Files, version: Version, newFile: VFile): void => {
-    if (typeof version === 'string') {
-        switch (version) {
-            case 'latest':
-            case '*':
-                files.push(newFile)
-                return;
-            case 'earliest':
-                files[0] = newFile;
-                return;
+    const cVersion = canonicalizeVersion(version, files.length);
+    if (cVersion === null) {
+        throw new Error(`Cannot set version ${version}`);
+    } else if (typeof cVersion === 'string') {
+        if (!files[TAGS]) {
+            files[TAGS] = {};
         }
-        // If a number passed as a string convert to a number.
-        if (/^\d+$/.test(version)) {
-            return setVersion(files, Number.parseInt(version, 10), newFile);
-        }
-        // Tag
-        files[TAGS] = files[TAGS] ?? {};
         files[TAGS]![version] = newFile;
-        return;
+    } else {
+        files[cVersion] = newFile;
     }
-    if (version < 0) throw new Error(`Negative file version: ${newFile.name}:${version}`);
-    files[version === -1 ? files.length : version] = newFile;
 };
 
 /**
@@ -140,33 +157,27 @@ export const setVersion = (files: Files, version: Version, newFile: VFile): void
  * @returns void
  */
 export const deleteVersion = (files: Files, version: Version): void => {
-    if (typeof version === 'string') {
+    const cVersion = canonicalizeVersion(version, files.length);
+    if (cVersion === null) {
+        return;
+    } else if (typeof version === 'string') {
         switch (version) {
             case '*':
                 files.length = 0;
                 files[TAGS] = {};
                 files[METADATA] = files[METADATA] ?? {name: files[METADATA]!.name};
                 return;
-            case 'latest':
-                delete files[files.length - 1];
+            default:
+                // Tag
+                const tags = files?.[TAGS];
+                if (tags) {
+                    delete tags[version];
+                }
                 return;
-            case 'earliest':
-                delete files[0];
-                return;
-        }
-        // If a number passed as a string convert to a number.
-        if (/^\d+$/.test(version)) {
-            return deleteVersion(files, Number.parseInt(version, 10));
-        }
-        // Tag
-        const tags = files?.[TAGS];
-        if (tags) {
-            delete tags[version];
-        }
-        return;
+            }
+    } else {
+        delete files[version];
     }
-    if (version < 0) throw new Error(`Negative file version: ${version}`);
-    delete files[version === -1 ? files.length - 1 : version];
 };
 
 /**
