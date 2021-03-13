@@ -24,7 +24,7 @@
     "prebuild:docs": "npm install",
     "build:docs": "GRAPHVIZ_DOT=\"$(which dot)\" typedoc --out build/docs/api src/",
     "preserve": "npm run build:devtools",
-    "serve": "NODE_ENV=development SERVE=true rollup -c",
+    "serve": "npx serve -l tcp://0.0.0.0:5111",
     "predocs": "npm run build:config && npm run build:docs",
     "docs": "NODE_ENV=development SERVE=true SERVE_DOC=true rollup -c",
     "prewatch": "npm run build:devtools"

@@ -26,6 +26,8 @@ produce them. The rest are supporting mechanisms.
 
 The [current version of the notebook](https://observablehq.com/@bobkerns/file-attachments) can be found at the site.
 
+The local version can be viewed by running the script `npm run serve` and [accessing it via that server on port 5111](http://localhost:5111/notebook/index.html)
+
 ## package.json
 
 
