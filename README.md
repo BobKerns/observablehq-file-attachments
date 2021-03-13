@@ -75,7 +75,7 @@ This implements the same interface as [FileAttachment](https://observablehq.com/
 * Blob
 * JSON-compatible objects
 * Arrays such as would be returned from `.csv()` or `.tsv()`. Non-arrays will be converted to strings and parsed.
-* A function. returning the value or a promise to the value. This is the most useful form, as it defers computation until needed. Except in the case of a `ReadableStream`, the result is cached. The function is called with the following arguments:
+* A function. returning the value or a promise to the value. This is the most useful form, as it defers computation until needed. For example, it can be used to dynamically fetch data using `fetch`. Except in the case of a `ReadableStream`, the result is cached. The function is called with the following arguments:
     * _file_: the [AFile](#AFile).
     * _method_: One of `json`, `text`. `arrayBuffer`, `stream`, `url`, `csv`, `tsv`. These indicate how the data will be used, allowing the function to choose how to represent it. the usual conversions will be applied as needed, however, so it may be safely ignored.
     * _options_: The options supplied to the method accessing the data.
