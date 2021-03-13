@@ -177,7 +177,8 @@ export class AFileSystem implements Regenerable {
     }
 
     /**
-     * Return the metadata for the requested path.
+     * Return the metadata for the requested path. Metadata can be associated with either a specific
+     * version, or the entire collection of versions at a path. The results are merged.
      * @param path Path to the file
      * @returns Promise yielding Metadata or `null` if the file is not found.
      */
