@@ -40,7 +40,7 @@ export const isTree = (t?: Tree | Files): t is Tree => t instanceof Object;
 export const asFiles = (t?: Tree | Files): Files | null =>
     isFiles(t)
         ? t
-        : t === undefined
+        : t === undefined || t === null
             ? null
             : Throw(`Unexpected file level`);
 
@@ -53,7 +53,7 @@ export const asFiles = (t?: Tree | Files): Files | null =>
 export const asTree = (t?: Tree | Files): Tree | null =>
     isTree(t)
         ? t
-        : t === undefined
+        : t === undefined || t === null
             ? null
             : Throw(`Unexpected directory level`);
 
@@ -65,12 +65,14 @@ const isFunction = (t: any) => t instanceof Function;
  * @returns `true` if argument is a [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
  */
 export const isFileAttachment = (a: any): a is FileAttachment =>
-    isFunction(a?.json)
+    a
+    && isFunction(a?.json)
     && isFunction(a?.text)
     && isFunction(a?.blob)
     && isFunction(a?.buffer)
     && isFunction(a?.stream)
     && isFunction(a?.url)
+    && a.constructor !== Object;
 
 /**
  * Add a file at a specific version or label in a [[Files]] array.
