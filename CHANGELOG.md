@@ -1,5 +1,8 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.6
+* **BUILD**: Publish the docs to the GitHub Pages site.
+
 ## Release 0.1.5
 * **BUILD**: Remove extraneous files from the npm build
 * **BUILD**: Minify the output again now that terser is updated.
