@@ -16,6 +16,8 @@ import {OutputOptions, RollupOptions} from "rollup";
 import {chain as flatMap} from 'ramda';
 import externalGlobals from "rollup-plugin-external-globals";
 import serve from "rollup-plugin-serve";
+import virtual from '@rollup/plugin-virtual';
+import {execFileSync} from 'child_process';
 
 /**
  * The visualizer plugin fails to set the plugin name. We wrap it to remedy that.
@@ -35,6 +37,13 @@ const dev = mode === 'development';
 const serve_mode = process.env.SERVE && dev;
 const serve_doc = process.env.SERVE_DOC && serve_mode;
 
+const git_revision = execFileSync('git', ['show-ref', '--head', '--verify', '-s', 'HEAD'],
+                                 {encoding: 'utf8'})
+    .trim();
+const [git_author, git_timestamp] = execFileSync('git', ['log', '-n1', git_revision, '--pretty=format:%an:::%at'],
+                                                {encoding: 'utf8'})
+    .trim().split(':::');
+
 /**
  * Avoid non-support of ?. optional chaining.
  */
@@ -51,6 +60,20 @@ interface Package {
     [K: string]: any;
 }
 const pkg: Package  = require('./package.json');
+
+const VERSION = `
+export const VERSION = {
+    version: ${JSON.stringify(pkg.version)},
+    git: {
+        revision: ${JSON.stringify(git_revision.trim())},
+        repository: ${pkg.repository?.url ? JSON.stringify(pkg.repository?.url) : 'undefined'},
+        author: ${JSON.stringify(git_author)},
+        date: new Date(${Number.parseInt(git_timestamp, 10) * 1000})
+    },
+    date: new Date(${Date.now()}),
+    author: ${JSON.stringify(pkg.author)}
+};
+`;
 
 /**
  * Compute the list of outputs from [[package.json]]'s fields
@@ -110,15 +133,14 @@ const dbg: any = {name: 'dbg'};
  * @param resolved
  */
 const checkExternal = (id: string, from?: string, resolved?: boolean): boolean =>
-    !/gl-matrix|glMatrix/i.test(id) && (resolved
-        ? /node_modules/.test(id)
-        : !/^\./.test(id));
+    /web-streams-polyfill\/ponyfill\/es2018/.test(id)
 
 const options: RollupOptions = {
     input:'./src/index.ts',
     output: outputs(pkg),
-    //external: checkExternal,
+    external: checkExternal,
     plugins: [
+        virtual({VERSION}),
         resolve({
             // Check for these in package.json
             mainFields: mainFields(pkg, ['module', 'main', 'browser'])
@@ -137,7 +159,8 @@ const options: RollupOptions = {
         externalGlobals({
             // 'gl-matrix': "glMatrix",
             //'katex': 'katex',
-            'ramda': 'ramda'
+            // 'ramda': 'ramda',
+            "web-streams-polyfill/ponyfill/es2018": "globalThis"
         }),
         ...(!dev && !DISABLE_TERSER) ? [
             terser({

@@ -1,3 +1,9 @@
+/**
+ * A generator that returns an object whenever it has been signaled that the object has been updated.
+ *
+ * @module regenerator
+ */
+
 import { Regenerable } from "./types";
 
 export async function* regenerator<T extends Regenerable>(obj: T): AsyncGenerator<T> {

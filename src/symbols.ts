@@ -1,4 +1,8 @@
-
+/**
+ * Symbols for attaching special data to files and directories.
+ *
+ * @module symbols
+ */
 export const METADATA = Symbol.for('METADATA');
 export const CACHED_METADATA = Symbol.for('CACHED_METADATA');
 
@@ -18,7 +22,7 @@ export const CACHED_METADATA = Symbol.for('CACHED_METADATA');
  * The _rest_ argument will be an empty array.
  *
  * Return `null` to decline to create a file of the given name or version.
- * 
+ *
  * @see DIRECTORY
  */
 export const FILE = Symbol.for('FILE');

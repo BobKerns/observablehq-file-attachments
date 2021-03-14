@@ -1,28 +1,41 @@
-import {AFileSystem} from './AFileSystem';
+/**
+ * A wrapper for data from other than [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
+ * instances, presenting (nearly) the same interface.
+ *
+ * @module AFile
+ */
+
 import { CACHED_METADATA, METADATA } from './symbols';
-import { FileAttachment, Metadata } from './types';
+import { Files, IAFile, Metadata, Tree } from './types';
 import { encodeString } from './util';
 import {fromByteArray} from 'base64-js';
 
 import * as d3 from 'd3-dsv';
 
+
 /**
  * The target data format for decision-making about conversions.
  */
-export type DataMethod = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv' | 'tsv' | 'stream';
+export type DataFormat = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv' | 'tsv' | 'stream';
+
+export interface DataOptions {
+    array?: boolean,
+    typed?: boolean,
+    utf8?: boolean
+}
 
 /**
  * `new AFile(`_name_, _data_, _metadata_`)`
  *
  * This implements nearly the same interface as [FileAttachment](https://observablehq.com/@observablehq/file-attachments), but works with supplied data in a variety of forms:
- * * String—depending on the type requested, this may involve parsing or converting to an ArrayBuffer, Blob, or ReadableStream. _options_ arguments to the various extractors can include `{utf8: _false_}` to use UTF16 rather than UTF8 encoding.
+ * * String—depending on the type requested, this may involve parsing or converting to an ArrayBuffer, Blob, or ReadableStream. _options_ arguments to the various extractors can include `{utf8:` _false_`}` to use UTF16 rather than UTF8 encoding.
  * * ArrayBuffer
  * * ReadableStream
  * * Blob
  * * JSON-compatible objects
- * * Arrays such as would be returned from `.csv()` or `.tsv()`. Non-arrays will be converted to strings and parsed.
+ * * Arrays such as would be returned from {@link csv | .csv()} or {@link tsv | .tsv() }. Non-arrays will be converted to strings and parsed.
  * * A function. returning the value or a promise to the value. This is the most useful form, as it defers computation until needed. Except in the case of a `ReadableStream`, the result is cached. The function is called with the following arguments:
- *     * _file_: the [AFile](#AFile).
+ *     * _file_: the [[AFile]].
  *     * _method_: One of `json`, `text`. `arrayBuffer`, `stream`, `url`, `csv`, `tsv`. These indicate how the data will be used, allowing the function to choose how to represent it. the usual conversions will be applied as needed, however, so it may be safely ignored.
  *     * _options_: The options supplied to the method accessing the data.
  * * Arbitrary data not described above, which can be retrieved unchanged via the `.json()` method
@@ -32,7 +45,7 @@ export type DataMethod = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv
  *
  * All operations are asynchronous. This includes url(), which is synchronous in [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
  */
-export class AFile implements Omit<FileAttachment, 'url'> {
+export class AFile implements IAFile {
     [METADATA]: Metadata;
     [CACHED_METADATA]: Metadata;
     name: string;
@@ -75,7 +88,7 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Any options passed to the original method
      * @returns A `Promise` resolving to the data in the requested form.
      */
-    async getData(type: DataMethod, opts: any): Promise<any> {
+    async getData(type: DataFormat, opts: DataOptions): Promise<any> {
         let data = await ((!this.#noCache && this.#dataResult) || this.data);
         if (data instanceof AFile) {
             return data.getData(type, opts);
@@ -124,7 +137,7 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` that resolves to a JSON value.
      */
-    async json(opts = { utf8: true }) {
+    async json(opts: DataOptions = { utf8: true }) {
         const data = await this.getData('json', opts);
         if (
             data instanceof Blob ||
@@ -141,7 +154,7 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` that resolves to a text string.
      */
-    async text(opts = { utf8: true }) {
+    async text(opts: DataOptions = { utf8: true }) {
         const { utf8 = true } = opts;
         const data = await this.getData('text', opts);
         if (typeof data === 'string') return data;
@@ -172,7 +185,7 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` that resolves to a data URL with the data.
      */
-    async url(opts = { utf8: true }) {
+    async url(opts: DataOptions = { utf8: true }) {
         const data = await this.getData('url', opts);
         const mime = this?.['content-type'];
         if (typeof data === 'string') {
@@ -189,7 +202,7 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` which resolves to an array buffer with the data
      */
-    async arrayBuffer(opts = { utf8: true }) {
+    async arrayBuffer(opts: DataOptions = { utf8: true }) {
         const { utf8 = true } = opts;
         const data = await this.getData('arrayBuffer', opts);
         if (data instanceof ArrayBuffer) {
@@ -210,7 +223,7 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` that resolves to a `Blob`
      */
-    async blob(opts: any = {utf8: true}) {
+    async blob(opts: DataOptions = {utf8: true}) {
         const data = await this.getData('blob', opts);
         if (data instanceof Blob) {
             return data;
@@ -223,7 +236,7 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` which returns the data parsed as CSV
      */
-    async csv(opts = { utf8: true }) {
+    async csv(opts: DataOptions = { utf8: true }) {
         const data = await this.getData('csv', opts);
         if (Array.isArray(data)) return data;
         if (data.constructor === Object) return data;
@@ -235,14 +248,14 @@ export class AFile implements Omit<FileAttachment, 'url'> {
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` which returns the data parsed as TSV
      */
-    async tsv(opts = { utf8: true }) {
+    async tsv(opts: DataOptions = { utf8: true }) {
         const data = await this.getData('tsv', opts);
         if (Array.isArray(data)) return data;
         if (data.constructor === Object) return data;
         return dsv(await this.text(), "\t", opts);
     }
 
-    async stream(opts = { utf8: true }) {
+    async stream(opts: DataOptions = { utf8: true }) {
         let data = await this.getData('stream', opts);
         if (data instanceof ReadableStream) {
             return data;
@@ -255,11 +268,41 @@ export class AFile implements Omit<FileAttachment, 'url'> {
             controller.close();
             }
         });
-        }
     }
 
-// From ObservableHQ Standard Library
-async function dsv(data: any, delimiter: '\t' | ',', { array = false, typed = false, utf8 = false } = {}) {
+    /**
+     * Convenience method to construct a [[Files]] array from a list of data versions
+     * @param name the name of the file
+     * @param data The data for each version. (Typically, just one entry)
+     * @returns a [[Files]] array
+     */
+    static from(name: string, ...data: any[]): Files {
+        return data.map(d => new AFile(name, d));
+    }
+
+    /**
+     * Convenience method to add an entry to a directory, supplying the name just once.
+     * The result should be spliced into the directory.
+     *
+     * @param name
+     * @param data
+     * @returns A [[Tree] with a [[Files]] array under the given _name_.
+     */
+    static entry<T extends string>(name: T, ...data: any[]) {
+        return {
+            [name as T]: this.from(name, ...data)
+        } as {[k in T]: Files};
+    }
+}
+
+/**
+ *
+ * @param data The data to be parsed
+ * @param delimiter The field delimiter, either `"\t"` or `","`.
+ * @param options
+ * @returns
+ */
+async function dsv(data: any, delimiter: '\t' | ',', { array = false, typed = false, utf8 = false }: DataOptions = {}) {
     const typer = typed ? d3.autoType : () => null;
     switch (delimiter) {
         case '\t':

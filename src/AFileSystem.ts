@@ -1,15 +1,106 @@
+/**
+ * The main entry for creating a virtual data filesystem.
+ *
+ * ```javascript
+ * import { AFileSystem, AFile} from '@bobkerns/file-attachments'
+ *
+ * F = new AFileSystem(
+ *     {
+ *         data: {
+ *             // Arrays denote file versions.
+ *             table1: [
+ *                 FileAttachment('Table1.json'),
+ *                 FileAttachment('Table1.json@2')
+ *             ],
+ *             table2: [AFile('table2', {data: [[1, 5, 3] [2, 6, 4]]})]
+ *         },
+ *         test: {
+ *             table1: [FileAttachment('Table1-test.json')]
+ *         }
+ *     }
+ *   });
+ * // Make table2 appear in the /test directory as well.
+ * F.copy('/data/table2', '/test/table2'); // Perhaps more like a hard link
+ * // Label Version 2 of /data/table1 as 'release'
+ * // It can then be referenced as /label/table1@release, even if additional
+ * // versions are added later.
+ * F.label('/data/table1@2', 'release');
+ *
+ * // The notebook awaits
+ * TABLE1 = F.find('/data/table1').json();
+ *
+ * // Doesn't exist, so returns undefined
+ * NO_FILE = F.find('/noFile').json();
+ *
+ * // To get an error if the file doesn't exist:
+ * ERROR_FILE = F.find('/noFile').exists.json();
+ *
+ * // To get a file, once it is available
+ * AWAIT_FILE = F.waitFor('/notYet').json();
+ *
+ * // To add a file:
+ * F.add('/notYet', new AFile('notYet', {Some: 'data'}));
+ *
+ * // To get a file's data when added and receive updates.
+ * UPDATED_FILE = F.watch('/updatedFile').json();
+ *
+ * // Add some updates.
+ * {
+ *     for (i in range(0, 10)) {
+ *         await sleep(1000);
+ *         F.add('/updatedFile', new AFile('/updatedFile', {data: i}));
+ *     }
+ * }
+ *
+ * // Metadata
+ * METADATA_TABLE1 = F.metadata('/test/table2');
+ * ```
+ *
+ * @module AFileSystem
+ * @preferred
+ * @packageDocumentation
+ */
+
 import {asFiles, asTree, getVersion, isFileAttachment, setVersion, Throw} from './util';
-import {FileAction, CreateFilesAction, CreateDirectoryAction, Files, Regenerable, Tree, Version, FileAttachment, Metadata, VFile, Visitor } from './types';
+import { Files, Regenerable, Tree, Version, FileAttachment, Metadata, VFile, PromiseOr } from './types';
 import { METADATA, FILE, DIRECTORY, CACHED_METADATA } from './symbols';
 import { regenerator } from './regenerator';
+import { AFileAwait } from './AFileAwait';
 
 let nameNum = 0;
 
 const meta = (obj: any, metadata: any) => obj && Object.defineProperty(obj, METADATA, { value: metadata });
 
-// Traverse the filesystem, ultimately performing _action_ on the found file.
-// Missing files or directories are handled by createAction; the default is to
-// return null.
+interface Visitor<T> {
+    createFiles?: CreateFilesAction,
+    createDirectory?: CreateDirectoryAction,
+    file?: FileAction<T>,
+    directory?: DirectoryAction<T>
+}
+
+type CreateFilesAction = (filesystem: AFileSystem, path: string, name: string, version: Version, tree: Tree, files: Files)
+    => PromiseOr<Files | null>;
+
+type FileAction<T> = (path: string, name: string, version: Version, files: Files)
+        => PromiseOr<T>;
+
+type CreateDirectoryAction =
+    ((filesystem: AFileSystem, path: string, name: string, rest: string[], tree: Tree) => PromiseOr<Tree> | null)
+    | (() => null);
+
+type DirectoryAction<T> = (path: string, name: string, tree: Tree)
+    => PromiseOr<T>;
+
+/**
+ * Traverse the filesystem, ultimately performing _action_ on the found file.
+ * Missing files or directories are handled by createAction; the default is to
+ * return null.
+ * @param filesystem
+ * @param path
+ * @param tree
+ * @param visitor
+ * @returns
+ */
 const traverse = <T>(filesystem: AFileSystem, path: string, tree: Tree, visitor: Visitor<T | null>) => {
     const {
         file: fileAction = () => null,
@@ -79,7 +170,10 @@ const errorWrapper = (fs: AFileSystem, op: string, ...args: any[]) => <F extends
  *
  * A file can be any value, but normally they will be either an
  * [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or an
- * [AFile](#AFile); they implement the same interface
+ * [AFile](#AFile); they implement the same interface.
+ *
+ * The actual file is not returned, but rather an [AFileAwait](#AFileAwait). This is a proxy with the same
+ * methods, but the methods return `undefined` if the file specified is not found.
  */
 export class AFileSystem implements Regenerable {
     readOnly: boolean;
@@ -111,8 +205,7 @@ export class AFileSystem implements Regenerable {
      * Find the file at the given (possibly versioned) path.
      *
      * @param path the full pathname to the desired file
-     * @returns A promise to a [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or
-     *      [AFile](#AFile), or `null` if no file is found at that path.
+     * @returns An {@link AFileAwait}
      */
     find(path: string) {
         return errorWrapper(this, 'find', path)(() => {
@@ -127,7 +220,7 @@ export class AFileSystem implements Regenerable {
                 }
                 return file;
             };
-            return traverse(this, path, this.tree, {file: getFile});
+            return new AFileAwait(traverse(this, path, this.tree, {file: getFile}));
         })
     }
 

@@ -1,5 +1,6 @@
 /**
- * Various utilities.
+ * General utilities
+ * @module util
  */
 
 import { is } from "ramda";
@@ -91,6 +92,8 @@ const canonicalizeVersion = (version: Version | null | undefined, length: number
                 return length - 1;
             case 'earliest':
                 return 0;
+            case '*':
+                throw new Error(`Illegal version: ${version}`);
         }
         // If a number passed as a string convert to a number.
         if (/^[-+]?\d+$/.test(version)) {
@@ -153,28 +156,27 @@ export const setVersion = (files: Files, version: Version, newFile: VFile): void
  * Delete a specific version from a [[Files]] array. This is an internal tool for implementing
  * [[FILE]] handlers
  * @param files The Files array
- * @param version The version to delete. Either a version number or a label
+ * @param version The version to delete. Either a version number or a label. The special label '*' deletes all versions.
  * @returns void
  */
 export const deleteVersion = (files: Files, version: Version): void => {
+    switch (version) {
+        case '*':
+            files.length = 0;
+            files[TAGS] = {};
+            files[METADATA] = files[METADATA] ?? {name: files[METADATA]!.name};
+            return;
+    }
     const cVersion = canonicalizeVersion(version, files.length);
     if (cVersion === null) {
         return;
     } else if (typeof version === 'string') {
-        switch (version) {
-            case '*':
-                files.length = 0;
-                files[TAGS] = {};
-                files[METADATA] = files[METADATA] ?? {name: files[METADATA]!.name};
-                return;
-            default:
-                // Tag
-                const tags = files?.[TAGS];
-                if (tags) {
-                    delete tags[version];
-                }
-                return;
-            }
+        // Tag
+        const tags = files?.[TAGS];
+        if (tags) {
+            delete tags[version];
+        }
+        return;
     } else {
         delete files[version];
     }

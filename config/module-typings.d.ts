@@ -92,3 +92,8 @@ declare module '@observablehq/stdlib' {
 declare module 'acorn-optional-chaining' {
     export default function <T>(p: T): T;
 }
+
+declare module '@rollup/plugin-virtual' {
+    export type VirtualOptions = {[k: string]: string};
+    export default function virtual(options: VirtualOptions): Plugin;
+}

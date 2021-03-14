@@ -26,6 +26,7 @@ Virtualization also allows for supplying alternate sources for the data, and dyn
 * Contents can be updated on on the fly.
 * The reactive control flow is preserved through the use of async generators.
 * Implements a versioned, tagged filesystem, facilitating comparing different versions of the same data.
+* Provides for discovered data; directories can be populated on-demand.
 * Works smoothly with ObservableHQ's attachment usage tracking and renumbering on reupload.
 
 # Usage
@@ -53,6 +54,35 @@ F.copy('/data/table2', '/test/table2'); // Perhaps more like a hard link
 // It can then be referenced as /label/table1@release, even if additional
 // versions are added later.
 F.label('/data/table1@2', 'release');
+
+// The notebook awaits
+TABLE1 = F.find('/data/table1').json();
+
+// Doesn't exist, so returns undefined
+NO_FILE = F.find('/noFile').json();
+
+// To get an error if the file doesn't exist:
+ERROR_FILE = F.find('/noFile').exists.json();
+
+// To get a file, once it is available
+AWAIT_FILE = F.waitFor('/notYet').json();
+
+// To add a file:
+F.add('/notYet', new AFile('notYet', {Some: 'data'}));
+
+// To get a file's data when added and receive updates.
+UPDATED_FILE = F.watch('/updatedFile').json();
+
+// Add some updates.
+{
+    for (i in range(0, 10)) {
+        await sleep(1000);
+        F.add('/updatedFile', new AFile('/updatedFile', {data: i}));
+    }
+}
+
+// Metadata
+METADATA_TABLE1 = F.metadata('/test/table2');
 ~~~
 
 ### AFileSystem
