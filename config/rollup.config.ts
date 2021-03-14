@@ -45,11 +45,6 @@ const [git_author, git_timestamp] = execFileSync('git', ['log', '-n1', git_revis
     .trim().split(':::');
 
 /**
- * Avoid non-support of ?. optional chaining.
- */
-const DISABLE_TERSER = true;
-
-/**
  * A rough description of the contents of [[package.json]].
  */
 interface Package {
@@ -65,13 +60,9 @@ const VERSION = `
 export const VERSION = {
     version: ${JSON.stringify(pkg.version)},
     git: {
-        revision: ${JSON.stringify(git_revision.trim())},
-        repository: ${pkg.repository?.url ? JSON.stringify(pkg.repository?.url) : 'undefined'},
-        author: ${JSON.stringify(git_author)},
-        date: new Date(${Number.parseInt(git_timestamp, 10) * 1000})
+        revision: ${JSON.stringify(git_revision.trim())}
     },
-    date: new Date(${Date.now()}),
-    author: ${JSON.stringify(pkg.author)}
+    date: new Date(${Date.now()})
 };
 `;
 
@@ -162,7 +153,7 @@ const options: RollupOptions = {
             // 'ramda': 'ramda',
             "web-streams-polyfill/ponyfill/es2018": "globalThis"
         }),
-        ...(!dev && !DISABLE_TERSER) ? [
+        ...(!dev) ? [
             terser({
             module: true
         })

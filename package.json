@@ -1,8 +1,8 @@
 {
   "name": "observablehq-file-attachments",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
-  "description": "Library to handle ObservableHQ's file attachments more flexibly, and to support virtual of them.",
+  "description": "Library to handle ObservableHQ's file attachments more flexibly, and to support virtualizing them.",
   "module": "lib/esm/index.js",
   "browser": "lib/umd/index.js",
   "jsdelivr": "lib/umd/index.js",
@@ -18,7 +18,6 @@
     "test": "jest",
     "prebuild": "npm run build:devtools",
     "build": "rollup -c",
-    "postbuild": "npm run build:docs",
     "watch": "NODE_ENV=development rollup -c --watch",
     "clean": "rm -rf build lib docs",
     "prepublishOnly": "NODE_ENV=production npm run build",
