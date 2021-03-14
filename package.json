@@ -1,11 +1,12 @@
 {
   "name": "observablehq-file-attachments",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "description": "Library to handle ObservableHQ's file attachments more flexibly, and to support virtual of them.",
   "module": "lib/esm/index.js",
-  "jsdelivr": "lib/esm/index.js",
-  "unpkg": "lib/esm/index.js",
+  "browser": "lib/umd/index.js",
+  "jsdelivr": "lib/umd/index.js",
+  "unpkg": "lib/umd/index.js",
   "types": "lib/esm/index.d.ts",
   "scripts": {
     "prebuild:config": "tsc --project config/tsconfig.json",

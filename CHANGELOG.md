@@ -1,5 +1,8 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.4
+* Restore UMD builds; the world is not QUITE ready...
+
 ## Release 0.1.3
 * Better typing of `AFile` and document that `AFile.url()` is async.
 * Make `AFileSystem.find()` synchronous again, with a proxy. The access methods
