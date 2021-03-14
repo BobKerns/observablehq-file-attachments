@@ -163,13 +163,10 @@ const convertContent = async (content, htmlFile, title) => {
     return htmlFile;
 };
 
-console.log('FOO', (await (await fetch(`https://api.github.com/repos/BobKerns/${PROJECT}/releases`))
-.json()))
-
 const releases = async () =>
     (await (await fetch(`https://api.github.com/repos/BobKerns/${PROJECT}/releases`))
         .json())
-        .filter(e => e.published_at > '2020-05-29T18:25:38Z')
+        .filter(e => e.published_at > '2021-03-13T18:25:38Z')
         .map(r => `* [${r.name}](https://bobkerns.github.io/${PROJECT}/docs/${r.tag_name}/api/index.html) ${r.prerelease ? ' (prerelease)' : ''}`)
         .join('\n');
 
@@ -196,6 +193,7 @@ const run = async () => {
     process.stdout.write(`ROOT: ${ROOT}\n`);
     process.stdout.write(`DOCS: ${DOCS}\n`);
     process.stdout.write(`docs: ${docs}\n`);
+    process.stdout.write(`Source: ${source}\n`);
     process.stdout.write(`Destination: ${target}\n`);
     await mkdir(DOCS);
     await mkdir(docs);
@@ -226,6 +224,7 @@ ${release_body}`;
 `;
     await convertContent(release_landing, join(target, 'index.html'), release.name);
     const copyTree = async (from, to) => {
+        console.log('copyTree', from, to);
         const dir = await readdir(resolve(ROOT, from), {withFileTypes: true});
         return  Promise.all(dir.map(d =>
             d.isFile()

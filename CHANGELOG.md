@@ -1,5 +1,8 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.7
+* **BUILD**: Add more diagnostics to documentation publishing step.
+
 ## Release 0.1.6
 * **BUILD**: Publish the docs to the GitHub Pages site.
 
