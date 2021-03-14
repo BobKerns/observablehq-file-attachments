@@ -1,6 +1,6 @@
 {
   "name": "observablehq-file-attachments",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "description": "Library to handle ObservableHQ's file attachments more flexibly, and to support virtual of them.",
   "main": "lib/cjs/index.js",
