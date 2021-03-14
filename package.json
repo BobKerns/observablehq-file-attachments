@@ -11,6 +11,7 @@
   "scripts": {
     "prebuild:config": "tsc --project config/tsconfig.json",
     "build:config": "",
+    "build:imports": "",
     "prebuild:devtools": "npm run build:config",
     "build:devtools": "tsc --project devtools/tsconfig.json",
     "pretest": "tsc --project src/__tests__ && npm run build:config",
