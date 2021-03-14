@@ -5,6 +5,11 @@ import { encodeString } from './util';
 import {fromByteArray} from 'base64-js';
 
 /**
+ * The target data format for decision-making about conversions.
+ */
+export type DataMethod = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv' | 'tsv' | 'stream';
+
+/**
  * `new AFile(`_name_, _data_, _metadata_`)`
  *
  * This implements the same interface as [FileAttachment](https://observablehq.com/@observablehq/file-attachments), but works with supplied data in a variety of forms:
@@ -68,7 +73,7 @@ export class AFile {
      * @param opts Any options passed to the original method
      * @returns A `Promise` resolving to the data in the requested form.
      */
-    async getData(type: string, opts: any) {
+    async getData(type: DataMethod, opts: any) {
         let data = await ((!this.#noCache && this.#dataResult) || this.data);
         if (typeof data === 'function') {
             this.#dataResult = Promise.resolve(data(this, type, opts)).then(
