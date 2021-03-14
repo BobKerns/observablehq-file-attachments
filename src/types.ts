@@ -20,7 +20,7 @@ export interface FileAttachment {
     json(): Promise<JsonObject>;
     blob(): Promise<Blob>;
     text(): Promise<string>;
-    buffer(): Uint8Array;
+    arrayBuffer(): Promise<ArrayBuffer>;
     url(): string;
     name: string;
     [CACHED_METADATA]?: Metadata;

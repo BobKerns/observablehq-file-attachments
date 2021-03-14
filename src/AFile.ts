@@ -1,6 +1,6 @@
 import {AFileSystem} from './AFileSystem';
 import { CACHED_METADATA, METADATA } from './symbols';
-import { Metadata } from './types';
+import { FileAttachment, Metadata } from './types';
 import { encodeString } from './util';
 import {fromByteArray} from 'base64-js';
 
@@ -14,7 +14,7 @@ export type DataMethod = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv
 /**
  * `new AFile(`_name_, _data_, _metadata_`)`
  *
- * This implements the same interface as [FileAttachment](https://observablehq.com/@observablehq/file-attachments), but works with supplied data in a variety of forms:
+ * This implements nearly the same interface as [FileAttachment](https://observablehq.com/@observablehq/file-attachments), but works with supplied data in a variety of forms:
  * * String—depending on the type requested, this may involve parsing or converting to an ArrayBuffer, Blob, or ReadableStream. _options_ arguments to the various extractors can include `{utf8: _false_}` to use UTF16 rather than UTF8 encoding.
  * * ArrayBuffer
  * * ReadableStream
@@ -30,9 +30,9 @@ export type DataMethod = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv
  *
  * _metadata_ is either an object with metadata to be combined, or a string, which is interpreted as the `contentType`, as a shorthand when that is the only metadata being supplied.
  *
- * All operations are asynchronous.
+ * All operations are asynchronous. This includes url(), which is synchronous in [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
  */
-export class AFile {
+export class AFile implements Omit<FileAttachment, 'url'> {
     [METADATA]: Metadata;
     [CACHED_METADATA]: Metadata;
     name: string;
@@ -75,8 +75,11 @@ export class AFile {
      * @param opts Any options passed to the original method
      * @returns A `Promise` resolving to the data in the requested form.
      */
-    async getData(type: DataMethod, opts: any) {
+    async getData(type: DataMethod, opts: any): Promise<any> {
         let data = await ((!this.#noCache && this.#dataResult) || this.data);
+        if (data instanceof AFile) {
+            return data.getData(type, opts);
+        }
         if (typeof data === 'function') {
             this.#dataResult = Promise.resolve(data(this, type, opts)).then(
                 d => ((this.#noCache = d instanceof ReadableStream), d)
@@ -164,7 +167,8 @@ export class AFile {
     }
 
     /**
-     * Obtain a data URL with the data.
+     * Obtain a data URL with the data. Unlike [FileAttachment](https://observablehq.com/@observablehq/file-attachments),
+     * this is async, that is, it returns a `Promise` to the URL.
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` that resolves to a data URL with the data.
      */
