@@ -50,7 +50,7 @@ interface Package {
     browser?: string;
     [K: string]: any;
 }
-const pkg: Package  = require('../package.json');
+const pkg: Package  = require('./package.json');
 
 /**
  * Compute the list of outputs from [[package.json]]'s fields
@@ -66,7 +66,7 @@ export const outputs = (p: Package) => flatMap((e: OutputOptions) => (e.file ? [
             globals: {
                 katex: "katex",
                 d3: "d3",
-                "@observablehq/stdlib": "observablehq"
+                "@observablehq/stdlib": "observablehq",
                 // "ramda": "ramda",
                 // "gl-matrix": "glMatrix"
             }
@@ -117,7 +117,7 @@ const checkExternal = (id: string, from?: string, resolved?: boolean): boolean =
 const options: RollupOptions = {
     input:'./src/index.ts',
     output: outputs(pkg),
-    external: checkExternal,
+    //external: checkExternal,
     plugins: [
         resolve({
             // Check for these in package.json

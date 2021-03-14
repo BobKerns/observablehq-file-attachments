@@ -4,6 +4,8 @@ import { Metadata } from './types';
 import { encodeString } from './util';
 import {fromByteArray} from 'base64-js';
 
+import * as d3 from 'd3-dsv';
+
 /**
  * The target data format for decision-making about conversions.
  */
@@ -252,6 +254,21 @@ export class AFile {
         }
     }
 
-function dsv(arg0: string, arg1: string, opts: { utf8: boolean; }) {
-    throw new Error('Function not implemented.');
-}
+// From ObservableHQ Standard Library
+async function dsv(data: any, delimiter: '\t' | ',', { array = false, typed = false, utf8 = false } = {}) {
+    const typer = typed ? d3.autoType : () => null;
+    switch (delimiter) {
+        case '\t':
+            if (array) {
+                return d3.tsvParseRows(await data, typer);
+            } else {
+                return d3.tsvParse(await data, typer);
+            }
+        case ',':
+            if (array) {
+                return d3.csvParseRows(await data, typer);
+            } else {
+                return d3.csvParse(await data, typer);
+            }
+    }
+  }
