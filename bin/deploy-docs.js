@@ -75,7 +75,7 @@ const ROOT = resolve('.');
 const DOCS =
     github
         ? join(github, 'build/docdest')
-        : ROOT;
+        : join(ROOT, 'build/docdest');
 
 const SITEBASE =
     github

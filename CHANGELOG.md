@@ -1,5 +1,8 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.8
+* **BUILD**: Fix documentation publishing (don't copy non-existing doc/ dir).
+
 ## Release 0.1.7
 * **BUILD**: Add more diagnostics to documentation publishing step.
 
