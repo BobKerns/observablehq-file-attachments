@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Change Log</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body, [{left: '$`', right: '`$', display: false},{left: '$$', right: '$$', display: true},{left: '\(', right: '\)', display: false},{left: '\[', right: '\]', display: true}]);"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.0.3/styles/xcode.css" integrity="sha256-OI7B0pICACICPVbs30FdQ/l6qL8TnsfhyGAdg5m5NzQ=" crossorigin="anonymous">
+</head>
+<body><h1 id="change-log-for-observablehq-file-attachments">Change Log for observablehq-file-attachments</h1>
+<h2 id="release-019">Release 0.1.9</h2>
+<ul>
+<li><strong>BUILD</strong>: Forgot the actual fix in 0.1.8, LOL!</li>
+</ul>
+<h2 id="release-018">Release 0.1.8</h2>
+<ul>
+<li><strong>BUILD</strong>: Fix documentation publishing (don&#39;t copy non-existing doc/ dir).</li>
+</ul>
+<h2 id="release-017">Release 0.1.7</h2>
+<ul>
+<li><strong>BUILD</strong>: Add more diagnostics to documentation publishing step.</li>
+</ul>
+<h2 id="release-016">Release 0.1.6</h2>
+<ul>
+<li><strong>BUILD</strong>: Publish the docs to the GitHub Pages site.</li>
+</ul>
+<h2 id="release-015">Release 0.1.5</h2>
+<ul>
+<li><strong>BUILD</strong>: Remove extraneous files from the npm build</li>
+<li><strong>BUILD</strong>: Minify the output again now that terser is updated.</li>
+<li><strong>BUILD</strong>: Don&#39;t build docs on every build.</li>
+<li><strong>BUILD</strong>: Reduce <code>VERSION</code> info</li>
+</ul>
+<h2 id="release-014">Release 0.1.4</h2>
+<ul>
+<li><strong>BUILD</strong>: Restore UMD builds; the world is not QUITE ready...</li>
+</ul>
+<h2 id="release-013">Release 0.1.3</h2>
+<ul>
+<li>Better typing of <code>AFile</code> and document that <code>AFile.url()</code> is async.</li>
+<li>Make <code>AFileSystem.find()</code> synchronous again, with a proxy. The access methods</li>
+<li>(<code>.json()</code>, <code>.text()</code>, etc.) now resolve to <code>undefined</code> if the file is not found.</li>
+<li>The <code>.exists</code> accessor can be used to get a version that rejects with a <code>VirtualFileNotFound</code> error.</li>
+<li>Add <code>AFile.from()</code> and <code>AFile.entry()</code> convenience functions.</li>
+<li><strong>BUILD</strong>: <code>VERSION</code> export contains information about the build. (Currently has extra info, will trim it down later.)</li>
+<li><strong>BUILD</strong>: Only ESM modules are built. It is time for other formats to <strong><em>DIE</em></strong>.</li>
+<li><strong>BUILD</strong>: The necessary <code>d3-dsv</code> parser is now included in the build.</li>
+<li><strong>DOC</strong>: The documentation has been organized and expanded.<h2 id="release-012">Release 0.1.2</h2>
+</li>
+<li><strong>BUILD</strong>: Update transpilation for ESM modules and statically include our dependencies.</li>
+</ul>
+<h2 id="release-011">Release 0.1.1</h2>
+<ul>
+<li><strong>BUILD</strong>: Bundle up the exports into index.ts for convenent import.</li>
+</ul>
+<h2 id="release-010">Release 0.1.0</h2>
+<p>Initial release, translated from the original ObservableHQ notebook.</p>
+</body>
+</html>
