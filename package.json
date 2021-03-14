@@ -1,7 +1,7 @@
 {
   "name": "observablehq-file-attachments",
   "title": "ObservableHQ FileAttachment Virtual Filesystem",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "type": "module",
   "description": "Library to handle ObservableHQ's file attachments more flexibly, and to support virtualizing them.",
   "module": "lib/esm/index.js",
@@ -29,6 +29,7 @@
     "predocs": "npm run build:config && npm run build:docs",
     "docs": "NODE_ENV=development SERVE=true SERVE_DOC=true rollup -c",
     "prewatch": "npm run build:devtools",
+    "prepubdocs": "npm run build:docs",
     "pubdocs": "bin/deploy-docs.js"
   },
   "bin": {},

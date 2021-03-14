@@ -293,6 +293,11 @@ export class AFile implements IAFile {
             [name as T]: this.from(name, ...data)
         } as {[k in T]: Files};
     }
+
+    /**
+     * Preserve the class name across minification.
+     */
+    [Symbol.toStringTag]: 'AFile';
 }
 
 /**

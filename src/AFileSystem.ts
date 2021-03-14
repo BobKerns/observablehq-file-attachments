@@ -375,4 +375,9 @@ export class AFileSystem implements Regenerable {
         // And copy.
         return this.copy(path, to);
     }
+
+    /**
+     * Preserve the class name across minification.
+     */
+    [Symbol.toStringTag]: 'AFileSystem';
 }

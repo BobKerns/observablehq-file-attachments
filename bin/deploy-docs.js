@@ -202,6 +202,7 @@ const run = async () => {
     await Promise.all([
         ['CHANGELOG.md', 'Change Log'],
         ['README.md', TITLE],
+        ['README.md', TITLE, join(DOCS, 'index.html')],
         ['README.md', TITLE, join(target, 'README.html')]
     ].map(([f, title, f2]) =>
         convert(join(ROOT, f), f2 || join(docs, f), title)));
@@ -237,6 +238,7 @@ ${release_body}`;
                     .then(t => copyTree(join(from, d.name), t))
                 : Promise.resolve(null)));
     }
+    await copyTree(source, target);
     await copyTree(ohq, target_ohq);
     // Only check in as part of the packaging workflow.
     if (github) {

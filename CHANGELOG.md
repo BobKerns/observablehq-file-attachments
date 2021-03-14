@@ -1,5 +1,11 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.10
+* Preserve the class name across minification to make things less confusing.
+* Include the API docs in the documentation publishing step.
+* Set up the root of the documentation site as a copy of the `README.md`.
+* Link the documentation site from the `README.md`
+
 ## Release 0.1.9
 * **BUILD**: Forgot the actual fix in 0.1.8, LOL!
 

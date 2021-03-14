@@ -1,5 +1,9 @@
 # Project ObservableHQ FileAttachment Virtual Filesystem
 
+For full documentation, please see:
+* The [Documentation Site](https://bobkerns.github.io/observablehq-file-attachments/).
+* The [Release Documentation Site](https://bobkerns.github.io/observablehq-file-attachments/docs/).
+
 This provides more flexibility for working with [ObservableHQ's](https://observablehq.com) [FileAttachment](https://observablehq.com/@observablehq/file-attachments) objects, by placing them in a virtual directory structure. Generated and static data exist side-by-side.
 
 This addresses several issues with [FileAttachment](https://observablehq.com/@observablehq/file-attachments).

@@ -83,6 +83,12 @@ export class AFileAwait {
             });
         return new AFileAwait(ntarget, this.#name);
     }
+
+
+    /**
+     * Preserve the class name across minification.
+     */
+    [Symbol.toStringTag]: 'AFileAwait';
 }
 
 /**
@@ -93,4 +99,9 @@ export class VirtualFileNotFound extends Error {
     constructor(message = `Virtual file not found`) {
         super(message);
     }
+
+    /**
+     * Preserve the class name across minification.
+     */
+    [Symbol.toStringTag]: 'VirtualFileNotFound';
 }
