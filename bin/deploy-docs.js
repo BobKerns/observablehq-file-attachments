@@ -237,7 +237,6 @@ ${release_body}`;
                     .then(t => copyTree(join(from, d.name), t))
                 : Promise.resolve(null)));
     }
-    await copyTree(source, target);
     await copyTree(ohq, target_ohq);
     // Only check in as part of the packaging workflow.
     if (github) {

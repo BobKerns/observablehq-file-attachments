@@ -1,5 +1,8 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.9
+* **BUILD**: Forgot the actual fix in 0.1.8, LOL!
+
 ## Release 0.1.8
 * **BUILD**: Fix documentation publishing (don't copy non-existing doc/ dir).
 
