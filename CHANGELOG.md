@@ -7,6 +7,7 @@
 * **TEST**: Factor out the unit tests' Node polyfills into a common import.
 * **BUILD**: Allow running server on a specified port with SERVE=_port_.
 * **BUILD**: Check in the documentation root index.html file.
+* **BUILD**: Provide a copy of the current documentation at a non-version-dependent location.
 
 ## Release 0.1.10
 * Preserve the class name across minification to make things less confusing.

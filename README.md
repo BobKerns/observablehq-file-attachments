@@ -15,7 +15,7 @@ This addresses several issues with [FileAttachment](https://observablehq.com/@ob
   * This could include filtering or altering existing sources.
 * It should be easier to switch between versions, and tagging/labeling versions would be a big help.
 * It should be easier to track what attachments and versions are in use in old revisions. Replacing an old version with a new in the current notebook clutters up the set of unused attachments, cluttering up "unused" with "obsolete".
-* No metadata is associated with [FileAttachment](https://observablehq.com/@observablehq/file-attachments) instances. \`Content-length\`, \`Content-type\`, and \`last-modified\` are particularly useful, and are obtained by this code. In addition, the ${meta_link} operation can be used to attach metadata to files.
+* No metadata is associated with [FileAttachment](https://observablehq.com/@observablehq/file-attachments) instances. \`Content-length\`, \`Content-type\`, and \`last-modified\` are particularly useful, and are obtained by this code. In addition, the [meta](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/modules/util.html#meta) operation can be used to attach metadata to files.
 * I want to be able to request information, corresponding to resources on the net, that I optionally can substitute a [FileAttachment](https://observablehq.com/@observablehq/file-attachments).
 
 By indirecting through a constructed directory, [AFileSystem](#AFileSystem), these shortcomings can be mitigated. The cost, of course, is a bit of extra setup.
@@ -145,10 +145,6 @@ produce them. The rest are supporting mechanisms.
 The [current version of the notebook](https://observablehq.com/@bobkerns/file-attachments) can be found at the site.
 
 The local version can be viewed by running the script `npm run serve` and [accessing it via that server on port 5111](http://localhost:5111/notebook/index.html)
-
-## package.json
-
-
 
 ## Continuous Integration
 Three free Continuous Integration workflows are configured out of the box.  Remove any you

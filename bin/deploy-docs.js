@@ -186,6 +186,7 @@ const run = async () => {
     const source = join(ROOT, 'build', 'docs');
     const docs = join(DOCS, 'docs');
     const target = join(docs, TAG);
+    const current = join(docs, 'current');
     const ohq = join(ROOT, 'notebook');
     const target_ohq = join(target, 'notebook');
 
@@ -199,6 +200,7 @@ const run = async () => {
     await mkdir(docs);
     await mkdir(target);
     await mkdir(target_ohq);
+    await mkdir(current);
     await Promise.all([
         ['CHANGELOG.md', 'Change Log'],
         ['README.md', TITLE],
@@ -240,11 +242,14 @@ ${release_body}`;
     }
     await copyTree(source, target);
     await copyTree(ohq, target_ohq);
+    // Provide a duplicate copy at current for version-independent linking.
+    await copyTree(target, current);
     // Only check in as part of the packaging workflow.
     if (github) {
         await exec('git', 'config', 'user.email', '1154903+BobKerns@users.noreply.github.com');
         await exec('git', 'config', 'user.name', 'ReleaseBot');
         await exec('git', 'add', target);
+        await exec('git', 'add', current);
         await exec('git', 'add', 'index.html');
         await exec('git', 'add', 'docs/index.html');
         await exec('git', 'add', 'docs/CHANGELOG.html');
