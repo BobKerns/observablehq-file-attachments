@@ -70,7 +70,7 @@ export class AFile implements IAFile {
             : data.constructor === Object
             ? 'application/json'
             : 'application/binary');
-        this[METADATA].contenttype = contentType;
+        this[METADATA].contentType = contentType;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 ## Release 0.1.12
 * Add convenience methods file, versions, and entry
+* **FIX**: Metadata had `contenttype` instead of `contentType`.
 * **DOC**: Fix `README.md` links to take advantage of published current documentation.
 * **DOC**: Document the Continuous Integration.
 
