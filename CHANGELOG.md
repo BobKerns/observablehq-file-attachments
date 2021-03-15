@@ -1,5 +1,8 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.12
+
+
 ## Release 0.1.11
 * **FIX**: Fix CSV/TSV untyped parsing.
 * **FIX**: Inconsistencies between the types of file objects.
