@@ -13,8 +13,9 @@
 <body><h1 id="project-observablehq-fileattachment-virtual-filesystem">Project ObservableHQ FileAttachment Virtual Filesystem</h1>
 <p>For full documentation, please see:</p>
 <ul>
-<li>The <a href=https://bobkerns.github.io/observablehq-file-attachments/ >Documentation Site</a>.</li>
-<li>The <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/ >Release Documentation Site</a>.</li>
+<li>The <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/ >API Documentation Site</a>.</li>
+<li>The <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/ >Release Site</a>.</li>
+<li><a href=https://github.com/BobKerns/observablehq-file-attachments/ >Github source</a></li>
 </ul>
 <p>This provides more flexibility for working with <a href=https://observablehq.com >ObservableHQ&#39;s</a> <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> objects, by placing them in a virtual directory structure. Generated and static data exist side-by-side.</p>
 <p>This addresses several issues with <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a>.</p>
@@ -31,7 +32,7 @@
 <li>No metadata is associated with <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> instances. `Content-length`, `Content-type`, and `last-modified` are particularly useful, and are obtained by this code. In addition, the <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/modules/util.html#meta >meta</a> operation can be used to attach metadata to files.</li>
 <li>I want to be able to request information, corresponding to resources on the net, that I optionally can substitute a <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a>.</li>
 </ul>
-<p>By indirecting through a constructed directory, <a href=#AFileSystem >AFileSystem</a>, these shortcomings can be mitigated. The cost, of course, is a bit of extra setup.</p>
+<p>By indirecting through a constructed directory, <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afilesystem.afilesystem-1.html >AFileSystem</a>, these shortcomings can be mitigated. The cost, of course, is a bit of extra setup.</p>
 <p>Virtualization also allows for supplying alternate sources for the data, and dynamic updates to the data. The AsyncGenerator paradigm is used to allow dynamic updates while allowing proper updating of dependencies.</p>
 <h1 id="features">Features</h1>
 <ul>
@@ -99,12 +100,12 @@ UPDATED_FILE = F.watch(<span class="hljs-string">&#x27;/updatedFile&#x27;</span>
 <span class="hljs-comment">// Metadata</span>
 METADATA_TABLE1 = F.metadata(<span class="hljs-string">&#x27;/test/table2&#x27;</span>);
 </code></pre>
-<h3 id="afilesystem">AFileSystem</h3>
+<h3 id="class-afilesystem"><a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afilesystem.afilesystem-1.html >class <code>AFileSystem</code></a></h3>
 <p>The <code>AFileSystem</code> constructor takes a single argument, which represents an initial filesystem content. Every Object (not subclasses, but literal objects) represent a directory, while every array holds the versions of a logical file.</p>
 <p>Versions are specified on lookup by appending <code>@version</code> to the path. No version specified is the same as <code>@latest</code>, which obtains the highest numbered version (the last in the array). You can ignore named versions (labels), or even multiple versions, but files are always identified by being in an array.</p>
-<p>A file can be any value, but normally they will be either an <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> or an <a href=#AFile >AFile</a>; they implement the same interface</p>
-<p>Implementation: <a href=src/AFileSystem.ts >AFileAFileSystem,</a></p>
-<h3 id="class-afile">class <code>AFile</code></h3>
+<p>A file is either an <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> or an <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afile.afile-1.html >AFile</a>; they implement the same interface</p>
+<p>Implementation: <a href=https://github.com/BobKerns/observablehq-file-attachments/blob/main/src/AFileSystem.ts >AFileSystem on GitHub</a></p>
+<h3 id="class-afile"><a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afile.afile-1.html >class <code>AFile</code></a></h3>
 <p><code>new AFile(</code><em>name</em>, <em>data</em>, <em>metadata</em><code>)</code></p>
 <p>This implements the same interface as <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a>, but works with supplied data in a variety of forms:</p>
 <ul>
@@ -115,9 +116,9 @@ METADATA_TABLE1 = F.metadata(<span class="hljs-string">&#x27;/test/table2&#x27;<
 <li>JSON-compatible objects</li>
 <li>Arrays such as would be returned from <code>.csv()</code> or <code>.tsv()</code>. Non-arrays will be converted to strings and parsed.</li>
 <li>A function. returning the value or a promise to the value. This is the most useful form, as it defers computation until needed. For example, it can be used to dynamically fetch data using <code>fetch</code>. Except in the case of a <code>ReadableStream</code>, the result is cached. The function is called with the following arguments:<ul>
-<li><em>file</em>: the <a href=#AFile >AFile</a>.</li>
+<li><em>file</em>: the <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afile.afile-1.html >AFile</a>.</li>
 <li><em>method</em>: One of <code>json</code>, <code>text</code>. <code>arrayBuffer</code>, <code>stream</code>, <code>url</code>, <code>csv</code>, <code>tsv</code>. These indicate how the data will be used, allowing the function to choose how to represent it. the usual conversions will be applied as needed, however, so it may be safely ignored.</li>
-<li><em>options</em>: The options supplied to the method accessing the data.</li>
+<li><em>options</em>: The <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/interfaces/types.dataoptions.html >DataOptions</a> supplied to the method accessing the data.</li>
 </ul>
 </li>
 <li>Arbitrary data not described above, which can be retrieved unchanged via the <code>.json()</code> method</li>
@@ -125,13 +126,10 @@ METADATA_TABLE1 = F.metadata(<span class="hljs-string">&#x27;/test/table2&#x27;<
 </ul>
 <p><em>metadata</em> is either an object with metadata to be combined, or a string, which is interpreted as the <code>contentType</code>, as a shorthand when that is the only metadata being supplied.</p>
 <p>All operations are asynchronous.</p>
-<p>Implementation: <a href=src/AFile.ts >AFile</a></p>
-<h3 id="function-metafile-metadata">function meta(<em>file</em>, <em>metadata</em>)</h3>
-<p>Associate a <em>metadata</em> object with the specified file (or array of file versions). This is normally used to annotate entries in the <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> tree.</p>
-<p>Implmentation: <a href=src/util.ts >versionedFile</a></p>
-<h3 id="function-versionedfileversion-file">function versionedFile(<em>version</em>, <em>file</em>)</h3>
-<p>Convenience function that returns an array with the <em>file</em> version. If <em>version</em> is -1 or falsey, returns <code>[</code><em>file</em><code>]</code>.</p>
-<p>Implmentation: <a href=src/util.ts >versionedFile</a></p>
+<p>Implementation: <a href=https://github.com/BobKerns/observablehq-file-attachments/blob/main/src/AFile.ts >AFile on GitHub</a></p>
+<h3 id="function-metafile-metadata"><a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/modules/util.html#meta >function meta(<em>file</em>, <em>metadata</em>)</a></h3>
+<p>Associate a <em>metadata</em> object with the specified file (or array of file versions). This is normally used to annotate entries in the <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afilesystem.afilesystem-1.html >AFileSystem</a> tree.</p>
+<p>Implmentation: <a href=https://github.com/BobKerns/observablehq-file-attachments/blob/main/src/util.ts >meta on GitHub</a></p>
 <h1 id="content">Content</h1>
 <h2 id="primary-organization">Primary organization</h2>
 <p>The important files are the outputs included in the published module, and the sources that
@@ -139,18 +137,16 @@ produce them. The rest are supporting mechanisms.</p>
 <ul>
 <li><code>src/</code> contains the source code for the library.<br/></li>
 <li><code>src/__tests__</code> contains the tests<br/></li>
-<li><code>notebook/</code> contains the corresponding <a href=notebook/index.html >ObservableHQ notebook</a>. Currently, this is the original code; it will be changed to import this library and demonstrate is usage once this version is working and tested.</li>
+<li><code>notebook/</code> contains the corresponding <a href=https://github.com/BobKerns/observablehq-file-attachments/blob/main/notebook/index.html >ObservableHQ notebook</a>. Currently, this is the original code; it will be changed to import this library and demonstrate is usage once this version is working and tested.</li>
 </ul>
 <p>The <a href=https://observablehq.com/@bobkerns/file-attachments >current version of the notebook</a> can be found at the site.</p>
 <p>The local version can be viewed by running the script <code>npm run serve</code> and <a href=http://localhost:5111/notebook/index.html >accessing it via that server on port 5111</a></p>
 <h2 id="continuous-integration">Continuous Integration</h2>
-<p>Three free Continuous Integration workflows are configured out of the box.  Remove any you
-you do not need, or disable them in the relevant service.</p>
-<p>You probably do not need multiple builds on multiple services, but this will let you see each and make a choice. For simple things at least, the features are very similar. It is very useful to be able to build and test on multiple environments in parallel, something each of the services provides.</p>
-<ul>
-<li><a href=https://circleci.com >Circle CI</a></li>
-<li><a href=https://travis-ci.com >Travis CI</a></li>
-<li><a href=https://github.com >GitHub Workflows (CI)</a></li>
-</ul>
+<p>The project is configured to use GitHub Actions, doing a build/test of the code on any push to the main branch,
+and a build of the code and documentation on defining a release and release tag on Github.</p>
+<p>The release tag must be of the form <code>v${verson}</code>, e.g. <code>v1.2.3</code>. The name field is typically &quot;Release 1.2.3&quot;,
+and the description is copied from the CHANGELOG verbatim.</p>
+<p>Once defined, the release build builds a production build, builds the documentation, publishes the documentation to
+the <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/ >GitHub Pages site</a>, and the module to <a href=https://www.npmjs.com/package/observablehq-file-attachments >NPM</a>.</p>
 </body>
 </html>
