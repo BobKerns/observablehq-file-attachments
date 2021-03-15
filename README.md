@@ -147,12 +147,11 @@ The [current version of the notebook](https://observablehq.com/@bobkerns/file-at
 The local version can be viewed by running the script `npm run serve` and [accessing it via that server on port 5111](http://localhost:5111/notebook/index.html)
 
 ## Continuous Integration
-Three free Continuous Integration workflows are configured out of the box.  Remove any you
-you do not need, or disable them in the relevant service.
+The project is configured to use GitHub Actions, doing a build/test of the code on any push to the main branch,
+and a build of the code and documentation on defining a release and release tag on Github.
 
-You probably do not need multiple builds on multiple services, but this will let you see each and make a choice. For simple things at least, the features are very similar. It is very useful to be able to build and test on multiple environments in parallel, something each of the services provides.
+The release tag must be of the form `v${verson}`, e.g. `v1.2.3`. The name field is typically "Release 1.2.3",
+and the description is copied from the CHANGELOG verbatim.
 
-* [Circle CI](https://circleci.com)
-* [Travis CI](https://travis-ci.com)
-* [GitHub Workflows (CI)](https://github.com)
-
+Once defined, the release build builds a production build, builds the documentation, publishes the documentation to
+the [GitHub Pages site](https://bobkerns.github.io/observablehq-file-attachments/docs/), and the module to [NPM](https://www.npmjs.com/package/observablehq-file-attachments).

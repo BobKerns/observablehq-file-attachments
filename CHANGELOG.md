@@ -1,7 +1,7 @@
 # Change Log for observablehq-file-attachments
 
 ## Release 0.1.12
-
+* **DOC**: Document the Continuous Integration.
 
 ## Release 0.1.11
 * **FIX**: Fix CSV/TSV untyped parsing.
