@@ -2,15 +2,10 @@
  * Tests of AFile and AFileAwait
  */
 
+import './node-polyfills';
 import { AFile } from "../AFile";
 import { AFileAwait } from "../AFileAwait";
 import { Metadata } from "../types";
-
-import {ReadableStream} from 'web-streams-polyfill/ponyfill/es2018';
-(globalThis as any)['ReadableStream'] = ReadableStream;
-
-import { TextDecoder } from 'util';
-(globalThis as any)['TextDecoder'] = TextDecoder;
 
 // ASCII only...
 function str2ab(str: string) {

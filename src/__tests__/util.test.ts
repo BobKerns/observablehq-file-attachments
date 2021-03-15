@@ -1,4 +1,5 @@
-import { dsv } from "../util";
+import './node-polyfills';
+import { dsv, toArrayBuffer } from "../util";
 
 describe('Data conversion', () => {
 
@@ -87,5 +88,8 @@ describe('Data conversion', () => {
                 .toStrictEqual(withColumns([{foo: 71, bar: 28}], 'foo', 'bar')));
     });
 
-
+    describe('arrayBuffer', () => {
+        test('toArrayBuffer utf8', () =>
+            expect([...new Uint8Array(toArrayBuffer('this'))]).toStrictEqual('this'.split('').map(a => a.charCodeAt(0))))
+    });
 });

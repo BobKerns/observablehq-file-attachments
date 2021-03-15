@@ -3,7 +3,8 @@
 ## Release 0.1.11
 * **FIX**: Fix CSV/TSV untyped parsing.
 * **FIX**: Inconsistencies between the types of file objects.
-* **BUILD**: Choose a better Jest integration for VSCode.
+* **TEST**: Choose a better Jest integration for VSCode.
+* **TEST**: Factor out the unit tests' Node polyfills into a common import.
 * **BUILD**: Allow running server on a specified port with SERVE=_port_.
 * **BUILD**: Check in the documentation root index.html file.
 

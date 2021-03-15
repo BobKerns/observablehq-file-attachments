@@ -5,7 +5,8 @@
     "error-handling.test.ts",
     "directory.test.ts",
     "file.test.ts",
-    "util.test.ts"
+    "util.test.ts",
+    "node-polyfills.ts"
   ],
   "include": ["*.ts"],
   "exclude": ["node_modules"],

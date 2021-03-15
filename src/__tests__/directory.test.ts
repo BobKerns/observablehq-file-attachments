@@ -1,10 +1,7 @@
-import { find } from "ramda";
+import './node-polyfills';
 import { AFile } from "../AFile";
 import { AFileAwait, VirtualFileNotFound } from "../AFileAwait";
 import { AFileSystem } from "../AFileSystem";
-
-import {ReadableStream} from 'web-streams-polyfill/ponyfill/es2018';
-(globalThis as any)['ReadableStream'] = ReadableStream;
 
 describe('AFileSystem', () => {
     describe('creation', () => {
