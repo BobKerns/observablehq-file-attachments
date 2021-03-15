@@ -188,7 +188,7 @@ export const deleteVersion = (files: Files, version: Version): void => {
  * @param s The string to be encoded
  * @returns An `ArrayBuffer` with the string data as UTF-16
  */
-export const encodeString = (s: string) => {
+export const encodeString16 = (s: string) => {
     const ab = new ArrayBuffer(s.length * 2);
     const buf = new Uint16Array(ab);
     for (let i = 0; i < s.length; i++) {
@@ -197,10 +197,17 @@ export const encodeString = (s: string) => {
     return ab;
   };
 
+export const toArrayBuffer = (s: string, {utf8 = true}: DataOptions = {utf8: true}) => {
+    if (utf8) {
+        return new TextEncoder().encode(s).buffer
+    } else {
+        return encodeString16(s);
+    }
+}
+
 /**
  * Associate a _metadata_ object with the specified file (or array of file
- * versions). This is normally used to annotate entries in the
- * [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
+ * versions). This is normally used to annotate entries in the [[AFileSystem]]
  * tree.
  */
 export const meta = <T>(obj: T, metadata: Metadata) =>

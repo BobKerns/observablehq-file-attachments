@@ -7,7 +7,7 @@
 
 import { CACHED_METADATA, METADATA } from './symbols';
 import { Files, IAFile, Metadata, DataOptions } from './types';
-import { encodeString, dsv } from './util';
+import { dsv, toArrayBuffer } from './util';
 import {fromByteArray} from 'base64-js';
 
 /**
@@ -201,11 +201,8 @@ export class AFile implements IAFile {
         if (data instanceof Blob) {
             return data.arrayBuffer();
         }
-        if (utf8) {
-            return new TextEncoder().encode(await this.text({ utf8 })).buffer;
-        } else {
-            return encodeString(await this.text());
-        }
+        // No direct path to arrayBuffer. Convert to text, then to array buffer.
+        return toArrayBuffer(await this.text(opts), opts);
     }
 
     /**
