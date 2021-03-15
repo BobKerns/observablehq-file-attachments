@@ -1,7 +1,7 @@
 {
   "name": "observablehq-file-attachments",
   "title": "ObservableHQ FileAttachment Virtual Filesystem",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "type": "module",
   "description": "Library to handle ObservableHQ's file attachments more flexibly, and to support virtualizing them.",
   "module": "lib/esm/index.js",

@@ -9,7 +9,7 @@ export {AFileSystem} from './AFileSystem';
 export {AFile, DataFormat as DataMethod} from './AFile';
 export {AFileAwait, VirtualFileNotFound} from './AFileAwait';
 export {FILE, DIRECTORY} from './symbols';
-export {getVersion, setVersion, deleteVersion, meta} from './util';
+export {getVersion, setVersion, deleteVersion, meta, file, versions, entry, dsv} from './util';
 
 export {Metadata, JsonObject, FileAttachment, Version, VFile, Tree, PromiseOr,
         FileHandler, DirectoryHandler} from './types';

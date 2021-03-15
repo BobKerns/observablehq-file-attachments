@@ -1,5 +1,8 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.13
+* **FIX**: Export `file`, `versions`, `entry`, and `dsv`
+
 ## Release 0.1.12
 * Add convenience methods file, versions, and entry
 * **FIX**: Metadata had `contenttype` instead of `contentType`.
