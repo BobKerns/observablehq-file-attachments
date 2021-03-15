@@ -6,7 +6,7 @@ import { AFileSystem } from "../AFileSystem";
 import {ReadableStream} from 'web-streams-polyfill/ponyfill/es2018';
 (globalThis as any)['ReadableStream'] = ReadableStream;
 
-describe('AEFunction', () => {
+describe('AFileSystem', () => {
     describe('creation', () => {
         test('CreateEmpty',() =>
             expect(new AFileSystem({}).tree)
@@ -24,10 +24,10 @@ describe('AEFunction', () => {
     describe('find', () => {
         describe('empty', () => {
             const sut = new AFileSystem({}, {readOnly: true, name: 'SUT'});
-            test('empty in root', () =>
+            test('empty in root 1', () =>
                 expect(sut.find('/nofile'))
                     .toBeInstanceOf(AFileAwait));
-            test('empty in root', () =>
+            test('empty in root 2', () =>
                 expect(sut.find('/nofile').target)
                     .resolves.toBeNull());
 

@@ -2,10 +2,10 @@
   // Inherit the project settings.
   "extends": "../tsconfig.json",
   "files": [
-    "error-handling.ts",
-    "directory.ts",
-    "file.ts"
-    ,"util.test.ts"
+    "error-handling.test.ts",
+    "directory.test.ts",
+    "file.test.ts",
+    "util.test.ts"
   ],
   "include": ["*.ts"],
   "exclude": ["node_modules"],

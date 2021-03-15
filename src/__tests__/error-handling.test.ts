@@ -9,7 +9,7 @@
 describe("Verify handling stack traces correctly.", () => {
    test("Test stack mapping", () => {
        try {
-           // The following throw must be on line 18.
+           // The following throw must be on line 17.
            //
            //
            //
@@ -17,7 +17,7 @@ describe("Verify handling stack traces correctly.", () => {
            throw new Error("E"); // This must be line 17.
        } catch (e) {
            expect(e.message).toBe("E");
-           expect(e.stack).toMatch(/[/\\]error-handling.ts[^a-zA-Z0-9]+17/m);
+           expect(e.stack).toMatch(/.*[/\\]error-handling[.]test[.]ts[^a-zA-Z0-9]+17[^0-9].*/m);
        }
    })
 });
