@@ -3,9 +3,10 @@
  * @module util
  */
 
-import { is } from "ramda";
 import { METADATA, TAGS } from "./symbols";
-import { FileAttachment, Files, Metadata, Tree, Version, VFile } from "./types";
+import { FileAttachment, Files, Metadata, Tree, Version, VFile, DataOptions, PromiseOr } from "./types";
+
+import * as d3 from 'd3-dsv';
 
 /**
  * like 'throw', but a function rather than a statement.
@@ -196,11 +197,37 @@ export const encodeString = (s: string) => {
     return ab;
   };
 
-  /**
-   * Associate a _metadata_ object with the specified file (or array of file
-   * versions). This is normally used to annotate entries in the
-   * [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
-   * tree.
-   */
+/**
+ * Associate a _metadata_ object with the specified file (or array of file
+ * versions). This is normally used to annotate entries in the
+ * [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
+ * tree.
+ */
 export const meta = <T>(obj: T, metadata: Metadata) =>
    obj && Object.defineProperty(obj, METADATA, { value: metadata });
+
+const nullTyper = undefined as unknown as typeof d3.autoType;
+/**
+ *
+ * @param data The data to be parsed
+ * @param delimiter The field delimiter, either `"\t"` or `","`.
+ * @param options
+ * @returns
+ */
+export function dsv(data: string, delimiter: '\t' | ',', { array = false, typed = false, utf8 = false }: DataOptions = {}) {
+    const typer = typed ? d3.autoType : nullTyper;
+    switch (delimiter) {
+        case '\t':
+            if (array) {
+                return d3.tsvParseRows(data, typer);
+            } else {
+                return d3.tsvParse(data, typer);
+            }
+        case ',':
+            if (array) {
+                return d3.csvParseRows(data, typer);
+            } else {
+                return d3.csvParse(data, typer);
+            }
+    }
+  }

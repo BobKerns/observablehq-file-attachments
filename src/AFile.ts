@@ -6,23 +6,14 @@
  */
 
 import { CACHED_METADATA, METADATA } from './symbols';
-import { Files, IAFile, Metadata, Tree } from './types';
-import { encodeString } from './util';
+import { Files, IAFile, Metadata, DataOptions } from './types';
+import { encodeString, dsv } from './util';
 import {fromByteArray} from 'base64-js';
-
-import * as d3 from 'd3-dsv';
-
 
 /**
  * The target data format for decision-making about conversions.
  */
 export type DataFormat = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv' | 'tsv' | 'stream';
-
-export interface DataOptions {
-    array?: boolean,
-    typed?: boolean,
-    utf8?: boolean
-}
 
 /**
  * `new AFile(`_name_, _data_, _metadata_`)`
@@ -160,19 +151,19 @@ export class AFile implements IAFile {
         if (typeof data === 'string') return data;
         if (data instanceof ArrayBuffer) {
             if (utf8) {
-            return new TextDecoder().decode(new Uint8Array(data));
+                return new TextDecoder().decode(new Uint8Array(data));
             } else {
-            return String.fromCodePoint(...new Uint16Array(data));
+                return String.fromCodePoint(...new Uint16Array(data));
             }
         }
         if (data instanceof Blob) {
             if (utf8) {
-            return new TextDecoder().decode(
-                new Uint8Array(await data.arrayBuffer())
+                return new TextDecoder().decode(
+                    new Uint8Array(await data.arrayBuffer())
             );
             } else {
-            return String.fromCodePoint(
-                ...new Uint16Array(await data.arrayBuffer())
+                return String.fromCodePoint(
+                    ...new Uint16Array(await data.arrayBuffer())
             );
             }
         }
@@ -300,27 +291,3 @@ export class AFile implements IAFile {
     [Symbol.toStringTag]: 'AFile';
 }
 
-/**
- *
- * @param data The data to be parsed
- * @param delimiter The field delimiter, either `"\t"` or `","`.
- * @param options
- * @returns
- */
-async function dsv(data: any, delimiter: '\t' | ',', { array = false, typed = false, utf8 = false }: DataOptions = {}) {
-    const typer = typed ? d3.autoType : () => null;
-    switch (delimiter) {
-        case '\t':
-            if (array) {
-                return d3.tsvParseRows(await data, typer);
-            } else {
-                return d3.tsvParse(await data, typer);
-            }
-        case ',':
-            if (array) {
-                return d3.csvParseRows(await data, typer);
-            } else {
-                return d3.csvParse(await data, typer);
-            }
-    }
-  }

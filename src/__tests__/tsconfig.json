@@ -3,7 +3,9 @@
   "extends": "../tsconfig.json",
   "files": [
     "error-handling.ts",
-    "directory.ts"
+    "directory.ts",
+    "file.ts"
+    ,"util.test.ts"
   ],
   "include": ["*.ts"],
   "exclude": ["node_modules"],

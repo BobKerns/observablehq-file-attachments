@@ -4,9 +4,27 @@
  * @module types
  */
 
-import { AFile, DataOptions } from './AFile';
+import { AFile } from './AFile';
 import { AFileSystem } from './AFileSystem';
 import {CACHED_METADATA, DIRECTORY, FILE, METADATA, TAGS} from './symbols';
+
+/**
+ * Options for requestion data from a [[VFile]]/
+ */
+export interface DataOptions {
+    /**
+     * For TSV and CSV, whether to return the rows as an array.
+     */
+    array?: boolean,
+    /**
+     * For TSV and CSV, whether to attempt to convert the values to e.g. numbers
+     */
+    typed?: boolean,
+    /**
+     * Whether data should be interconverted between text and binary based on utf8, rather than utf16.
+     */
+    utf8?: boolean
+}
 
 /**
  * Objects that JSON.parse can produce.
