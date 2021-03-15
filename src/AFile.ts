@@ -258,30 +258,6 @@ export class AFile implements IAFile {
     }
 
     /**
-     * Convenience method to construct a [[Files]] array from a list of data versions
-     * @param name the name of the file
-     * @param data The data for each version. (Typically, just one entry)
-     * @returns a [[Files]] array
-     */
-    static from(name: string, ...data: any[]): Files {
-        return data.map(d => new AFile(name, d));
-    }
-
-    /**
-     * Convenience method to add an entry to a directory, supplying the name just once.
-     * The result should be spliced into the directory.
-     *
-     * @param name
-     * @param data
-     * @returns A [[Tree] with a [[Files]] array under the given _name_.
-     */
-    static entry<T extends string>(name: T, ...data: any[]) {
-        return {
-            [name as T]: this.from(name, ...data)
-        } as {[k in T]: Files};
-    }
-
-    /**
      * Preserve the class name across minification.
      */
     [Symbol.toStringTag]: 'AFile';

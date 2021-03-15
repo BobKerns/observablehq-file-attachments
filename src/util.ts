@@ -7,6 +7,8 @@ import { METADATA, TAGS } from "./symbols";
 import { FileAttachment, Files, Metadata, Tree, Version, VFile, DataOptions, PromiseOr } from "./types";
 
 import * as d3 from 'd3-dsv';
+import { any } from "ramda";
+import { AFile } from "./AFile";
 
 /**
  * like 'throw', but a function rather than a statement.
@@ -130,6 +132,96 @@ export const getVersion = (files: Files, version: Version): VFile | null => {
             ? files[TAGS]?.[cVersion] ?? null
             : files[cVersion] ?? null;
 };
+
+/**
+ * Wrap an [[AFile]] in a [[Files]] version array, with the specified
+ * versions or labels assigned to it.
+ * @param file the [[AFile]]
+ * @param versions zero or more [[Version]]s (positive numbers or strings)
+ * @returns a [[Files]] array.
+ */
+export const versions = (file: AFile, ...versionList: Version[]) => {
+    if (versions.length === 0) {
+        versionList = [1];
+    }
+    const files: Files = [];
+    versionList.forEach(v => setVersion(files, v, file));
+    return files;
+};
+
+/**
+ * Convenience method to construct an entry in a [[AFileSystem]] tree.
+ * Takes a name and a data item, optional metadata, and list of versions,
+ * and constructs the appropriate [[Files]] array for the tree.
+ *
+ * Simplest usage:
+ * ```javascript
+ * F = new AFileSystem({
+ *   myFile: file('myFile', (myData));
+ * });
+ *
+ * Advanced usage that supplies a creation date as metadata, and gives the file
+ * a version of 1 and a label of 'tested';
+ * ```javascript
+ * F = new AFileSystem({
+ *   myFile: file('myFile', (myData), {creationDate}, 1, 'tested');
+ * });
+ * ```
+ * @param name The name of the file
+ * @param data The data to store
+ * @param metadata The metadata to associate with both array and file
+ * @param versionList A list of versions to store the file under, or `[1]`.
+ * @returns
+ */
+export function file(name: string, data: any, metadata?: Partial<Metadata> | null | undefined, ...versionList: Version[]): Files;
+export function file(name: string, data: any, ...versionList: Version[]): Files;
+export function file(name: string, data: any, metadata?: Partial<Metadata>|Version|null|undefined, ...versionList: Version[]) {
+    if (!metadata) {
+        const mData = {name};
+        const file = new AFile(name, data);
+        return meta(versions(file, ...versionList), mData)
+    } if (typeof metadata === 'string' || typeof metadata === 'number') {
+        const mData = {name};
+        const file = new AFile(name, data);
+        return meta(versions(file, metadata, ...versionList), mData)
+    } else {
+        const mData = {name, ...(metadata ?? {})};
+        const file = new AFile(name, data, metadata);
+        return meta(versions(file, ...versionList), mData);
+    }
+};
+
+/**
+ * Convenience method to construct an entry in a [[AFileSystem]] tree,
+ * without having to specifiy the name multiple times.
+ * Takes a name and a data item, optional metadata, and list of versions,
+ * and constructs the appropriate [[Files]] array for the tree.
+ *
+ * Simplest usage:
+ * ```javascript
+ * F = new AFileSystem({
+ *   myFile: file('myFile', (myData));
+ * });
+ *
+ * Advanced usage that supplies a creation date as metadata, and gives the file
+ * a version of 1 and a label of 'tested';
+ * ```javascript
+ * F = new AFileSystem({
+ *   ...entry('myFile', (myData), {creationDate}, 1, 'tested');
+ * });
+ * ```
+ * @param name The name of the file
+ * @param data The data to store
+ * @param metadata The metadata to associate with both array and file
+ * @param versionList A list of versions to store the file under, or `[1]`.
+ * @returns
+ */
+export function entry(name: string, data: any, metadata?: Partial<Metadata> | null | undefined, ...versionList: Version[]): Tree;
+export function entry(name: string, data: any, ...versionList: Version[]): Tree;
+export function entry(name: string, data: any, metadata?: Partial<Metadata>|Version|null|undefined, ...versionList: Version[]) {
+    return {[name]: file(name, data, metadata as Partial<Metadata>, ...versionList)};
+};
+
 
 /**
  * Add a file at a specific version or label in a [[Files]] array.
