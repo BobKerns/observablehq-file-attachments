@@ -4,7 +4,8 @@
  *  @module
  */
 
-import { IAFile, JsonObject, Metadata, VFile } from "./types";
+import { CACHED_METADATA, METADATA } from "./symbols";
+import { IAFile, IAFileAwait, JsonObject, Metadata, VFile } from "./types";
 
 /**
  * This accepts a `Promise`, and delegates its methods to the resolved result of the `Promise`.
@@ -16,7 +17,7 @@ import { IAFile, JsonObject, Metadata, VFile } from "./types";
  * const data = FS.find('/nofile').exists.json();
  * ```
  */
-export class AFileAwait {
+export class AFileAwait implements IAFileAwait {
     #target: Promise<VFile|null>;
     #name: string | undefined = '(unresolved)';
     /**
@@ -30,6 +31,11 @@ export class AFileAwait {
                 .then(t => {
                     if (t) {
                         this.#name = t.name ?? this.#name;
+                        this[METADATA] = {
+                            name: this.#name,
+                            ...(this[METADATA] ?? {}),
+                            ...(t[METADATA] ?? {})
+                        };
                     }
                     return t;
                 });
@@ -54,12 +60,20 @@ export class AFileAwait {
         return (await this.#target)?.arrayBuffer();
     }
 
+    async csv(): Promise<string | undefined> {
+        return (await this.#target)?.text();
+    }
+
+    async tsv(): Promise<string | undefined> {
+        return (await this.#target)?.text();
+    }
+
     /**
      * @returns the name, if it was supplied on construction, or if
      * the promise has resolved. Otherwise, returns `'(unresolved)'`;
      */
-    get name(): string|undefined {
-        return this.#name;
+    get name(): string {
+        return this.#name ?? `(unresolved)`;
     }
 
     /**
@@ -84,6 +98,8 @@ export class AFileAwait {
         return new AFileAwait(ntarget, this.#name);
     }
 
+    [METADATA]: Metadata | undefined;
+    [CACHED_METADATA]: Metadata | undefined;
 
     /**
      * Preserve the class name across minification.

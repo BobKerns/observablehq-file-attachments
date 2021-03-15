@@ -66,6 +66,7 @@ interface FileAttachmentBase {
     arrayBuffer(opts?: DataOptions): Promise<ArrayBuffer>;
     csv(opts?: DataOptions): Promise<any>;
     tsv(opts?: DataOptions): Promise<any>;
+    url(): Promise<string>;
     name: string;
 }
 
@@ -74,7 +75,6 @@ interface FileAttachmentBase {
  * [FileAttachment](https://observablehq.com/@observablehq/file-attachments).
  */
 export interface FileAttachment extends FileAttachmentBase, MetadataProps {
-    url(): string;
     ['content-type']?: string;
 }
 
@@ -84,8 +84,41 @@ export interface FileAttachment extends FileAttachmentBase, MetadataProps {
  * than a `string`.
  */
 export interface IAFile extends FileAttachmentBase, MetadataProps {
-    url(): Promise<string>;
 }
+
+/**
+ * The methods of an interface that return a `Promise`.
+ */
+type AsyncMethodsOf<I, T extends keyof I = keyof I> = T extends string ? I[T] extends (...args: any) => Promise<any> ? T : never : never;
+
+/**
+ * Split out the methods of [[IAFile]] that are async.
+ */
+type IAFileMethods = AsyncMethodsOf<IAFile>;
+/**
+ * Split out everything in [[IAFile]] that is not an async method.
+ */
+type IAFileOther = Exclude<keyof IAFile, IAFileMethods>;
+
+/**
+ * Extract the wrapped type from a promise.
+ */
+type UnwrapPromise<T> = T extends Promise<infer P> ? P : T;
+
+/**
+ * Add another allowed return type to an async function.
+ */
+type AddReturnType<T extends (...args: any[]) => any, R> = (...args: Parameters<T>) => Promise<R | UnwrapPromise<ReturnType<T>>>
+
+/**
+ * The async methods of [[AFileAwait]] should return the same values as [[IAFile]] except each `Promise` can also
+ * resolve to `undefined`.
+ */
+export type IAFileAwait = {
+    [k in IAFileMethods]: AddReturnType<IAFile[k], undefined >;
+} & {
+    [k in IAFileOther]: IAFile[k];
+};
 
 /**
  * Version numbers/tags (labels) for files.

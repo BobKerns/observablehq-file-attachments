@@ -1,5 +1,12 @@
 # Change Log for observablehq-file-attachments
 
+## Release 0.1.11
+* **FIX**: Fix CSV/TSV untyped parsing.
+* **FIX**: Inconsistencies between the types of file objects.
+* **BUILD**: Choose a better Jest integration for VSCode.
+* **BUILD**: Allow running server on a specified port with SERVE=_port_.
+* **BUILD**: Check in the documentation root index.html file.
+
 ## Release 0.1.10
 * Preserve the class name across minification to make things less confusing.
 * Include the API docs in the documentation publishing step.

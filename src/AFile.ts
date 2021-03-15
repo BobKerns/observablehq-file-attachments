@@ -18,7 +18,7 @@ export type DataFormat = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv
 /**
  * `new AFile(`_name_, _data_, _metadata_`)`
  *
- * This implements nearly the same interface as [FileAttachment](https://observablehq.com/@observablehq/file-attachments), but works with supplied data in a variety of forms:
+ * This implements the same interface as [FileAttachment](https://observablehq.com/@observablehq/file-attachments), but works with supplied data in a variety of forms:
  * * String—depending on the type requested, this may involve parsing or converting to an ArrayBuffer, Blob, or ReadableStream. _options_ arguments to the various extractors can include `{utf8:` _false_`}` to use UTF16 rather than UTF8 encoding.
  * * ArrayBuffer
  * * ReadableStream
@@ -34,7 +34,7 @@ export type DataFormat = 'json' | 'text' | 'url' | 'arrayBuffer' | 'blob' | 'csv
  *
  * _metadata_ is either an object with metadata to be combined, or a string, which is interpreted as the `contentType`, as a shorthand when that is the only metadata being supplied.
  *
- * All operations are asynchronous. This includes url(), which is synchronous in [FileAttachment](https://observablehq.com/@observablehq/file-attachments)
+ * All operations are asynchronous.
  */
 export class AFile implements IAFile {
     [METADATA]: Metadata;
@@ -171,8 +171,7 @@ export class AFile implements IAFile {
     }
 
     /**
-     * Obtain a data URL with the data. Unlike [FileAttachment](https://observablehq.com/@observablehq/file-attachments),
-     * this is async, that is, it returns a `Promise` to the URL.
+     * Obtain `Promise` to a data URL with the data.
      * @param opts Options. The valid option is `utf8`, which defaults to true
      * @returns A `Promise` that resolves to a data URL with the data.
      */
