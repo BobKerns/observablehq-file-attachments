@@ -1,8 +1,9 @@
 # Project ObservableHQ FileAttachment Virtual Filesystem
 
 For full documentation, please see:
-* The [Documentation Site](https://bobkerns.github.io/observablehq-file-attachments/).
-* The [Release Documentation Site](https://bobkerns.github.io/observablehq-file-attachments/docs/).
+* The [API Documentation Site](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/).
+* The [Release Site](https://bobkerns.github.io/observablehq-file-attachments/docs/).
+* [Github source](https://github.com/BobKerns/observablehq-file-attachments/)
 
 This provides more flexibility for working with [ObservableHQ's](https://observablehq.com) [FileAttachment](https://observablehq.com/@observablehq/file-attachments) objects, by placing them in a virtual directory structure. Generated and static data exist side-by-side.
 
@@ -18,7 +19,7 @@ This addresses several issues with [FileAttachment](https://observablehq.com/@ob
 * No metadata is associated with [FileAttachment](https://observablehq.com/@observablehq/file-attachments) instances. \`Content-length\`, \`Content-type\`, and \`last-modified\` are particularly useful, and are obtained by this code. In addition, the [meta](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/modules/util.html#meta) operation can be used to attach metadata to files.
 * I want to be able to request information, corresponding to resources on the net, that I optionally can substitute a [FileAttachment](https://observablehq.com/@observablehq/file-attachments).
 
-By indirecting through a constructed directory, [AFileSystem](#AFileSystem), these shortcomings can be mitigated. The cost, of course, is a bit of extra setup.
+By indirecting through a constructed directory, [AFileSystem](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afilesystem.afilesystem-1.html), these shortcomings can be mitigated. The cost, of course, is a bit of extra setup.
 
 Virtualization also allows for supplying alternate sources for the data, and dynamic updates to the data. The AsyncGenerator paradigm is used to allow dynamic updates while allowing proper updating of dependencies.
 
@@ -89,16 +90,16 @@ UPDATED_FILE = F.watch('/updatedFile').json();
 METADATA_TABLE1 = F.metadata('/test/table2');
 ~~~
 
-### AFileSystem
+### [class `AFileSystem`](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afilesystem.afilesystem-1.html)
 The `AFileSystem` constructor takes a single argument, which represents an initial filesystem content. Every Object (not subclasses, but literal objects) represent a directory, while every array holds the versions of a logical file.
 
 Versions are specified on lookup by appending `@version` to the path. No version specified is the same as `@latest`, which obtains the highest numbered version (the last in the array). You can ignore named versions (labels), or even multiple versions, but files are always identified by being in an array.
 
-A file can be any value, but normally they will be either an [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or an [AFile](#AFile); they implement the same interface
+A file is either an [FileAttachment](https://observablehq.com/@observablehq/file-attachments) or an [AFile](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afile.afile-1.html); they implement the same interface
 
-Implementation: [AFileAFileSystem,](src/AFileSystem.ts)
+Implementation: [AFileSystem on GitHub](https://github.com/BobKerns/observablehq-file-attachments/blob/main/src/AFileSystem.ts)
 
-### class `AFile`
+### [class `AFile`](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afile.afile-1.html)
 
 `new AFile(`_name_, _data_, _metadata_`)`
 
@@ -110,9 +111,9 @@ This implements the same interface as [FileAttachment](https://observablehq.com/
 * JSON-compatible objects
 * Arrays such as would be returned from `.csv()` or `.tsv()`. Non-arrays will be converted to strings and parsed.
 * A function. returning the value or a promise to the value. This is the most useful form, as it defers computation until needed. For example, it can be used to dynamically fetch data using `fetch`. Except in the case of a `ReadableStream`, the result is cached. The function is called with the following arguments:
-    * _file_: the [AFile](#AFile).
+    * _file_: the [AFile](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afile.afile-1.html).
     * _method_: One of `json`, `text`. `arrayBuffer`, `stream`, `url`, `csv`, `tsv`. These indicate how the data will be used, allowing the function to choose how to represent it. the usual conversions will be applied as needed, however, so it may be safely ignored.
-    * _options_: The options supplied to the method accessing the data.
+    * _options_: The [DataOptions](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/interfaces/types.dataoptions.html) supplied to the method accessing the data.
 * Arbitrary data not described above, which can be retrieved unchanged via the `.json()` method
 * A `Promise` that resolves to any of the above.
 
@@ -120,17 +121,13 @@ _metadata_ is either an object with metadata to be combined, or a string, which 
 
 All operations are asynchronous.
 
-Implementation: [AFile](src/AFile.ts)
+Implementation: [AFile on GitHub](https://github.com/BobKerns/observablehq-file-attachments/blob/main/src/AFile.ts)
 
-### function meta(_file_, _metadata_)
-Associate a _metadata_ object with the specified file (or array of file versions). This is normally used to annotate entries in the [FileAttachment](https://observablehq.com/@observablehq/file-attachments) tree.
+### [function meta(_file_, _metadata_)](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/modules/util.html#meta)
+Associate a _metadata_ object with the specified file (or array of file versions). This is normally used to annotate entries in the [AFileSystem](https://bobkerns.github.io/observablehq-file-attachments/docs/current/api/classes/afilesystem.afilesystem-1.html) tree.
 
-Implmentation: [versionedFile](src/util.ts)
+Implmentation: [meta on GitHub](https://github.com/BobKerns/observablehq-file-attachments/blob/main/src/util.ts)
 
-### function versionedFile(_version_, _file_)
-Convenience function that returns an array with the _file_ version. If _version_ is -1 or falsey, returns `[`_file_`]`.
-
-Implmentation: [versionedFile](src/util.ts)
 # Content
 
 ## Primary organization
@@ -140,7 +137,7 @@ produce them. The rest are supporting mechanisms.
 
 * `src/` contains the source code for the library.<br/>
 * `src/__tests__` contains the tests<br/>
-* `notebook/` contains the corresponding [ObservableHQ notebook](notebook/index.html). Currently, this is the original code; it will be changed to import this library and demonstrate is usage once this version is working and tested.
+* `notebook/` contains the corresponding [ObservableHQ notebook](https://github.com/BobKerns/observablehq-file-attachments/blob/main/notebook/index.html). Currently, this is the original code; it will be changed to import this library and demonstrate is usage once this version is working and tested.
 
 The [current version of the notebook](https://observablehq.com/@bobkerns/file-attachments) can be found at the site.
 

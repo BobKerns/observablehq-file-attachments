@@ -1,6 +1,7 @@
 # Change Log for observablehq-file-attachments
 
 ## Release 0.1.12
+* **DOC**: Fix `README.md` links to take advantage of published current documentation.
 * **DOC**: Document the Continuous Integration.
 
 ## Release 0.1.11
