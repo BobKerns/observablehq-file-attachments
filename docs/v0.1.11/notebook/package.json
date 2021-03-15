@@ -1,0 +1,14 @@
+{
+  "name": "@bobkerns/file-attachments",
+  "main": "0d05b8606967fe2d@1289.js",
+  "version": "1289.0.0",
+  "homepage": "https://observablehq.com/@bobkerns/file-attachments",
+  "author": {
+    "name": "Bob Kerns",
+    "url": "https://observablehq.com/@bobkerns"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4"
+  }
+}
