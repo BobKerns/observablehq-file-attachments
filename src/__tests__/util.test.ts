@@ -1,5 +1,8 @@
 import './node-polyfills';
-import { dsv, toArrayBuffer } from "../util";
+import { dsv, file, fromArrayBuffer, toArrayBuffer } from "../util";
+import { AFile } from '../AFile';
+import { METADATA, TAGS } from '../symbols';
+import { range } from 'genutils';
 
 describe('Data conversion', () => {
 
@@ -90,6 +93,91 @@ describe('Data conversion', () => {
 
     describe('arrayBuffer', () => {
         test('toArrayBuffer utf8', () =>
-            expect([...new Uint8Array(toArrayBuffer('this'))]).toStrictEqual('this'.split('').map(a => a.charCodeAt(0))))
+            expect([...new Uint8Array(toArrayBuffer('this'))])
+                .toStrictEqual('this'.split('').map(a => a.charCodeAt(0))));
+
+
+        test('toArrayBuffer utf16', () =>
+            expect([...new Uint16Array(toArrayBuffer('this', {utf8: false}))])
+                .toStrictEqual('this'.split('').map(a => a.charCodeAt(0))));
+
+
+        test('fromArrayBuffer utf8', () =>
+            expect(fromArrayBuffer(toArrayBuffer('that')))
+                .toStrictEqual('that'));
+
+
+        test('fromArrayBuffer utf16', () =>
+            expect(fromArrayBuffer(toArrayBuffer('that', {utf8: false}), {utf8: false}))
+                .toStrictEqual('that'));
+
+        const big = range(0, 1000).map(() => '0123456789').join();
+        test('fromArrayBuffer utf16 big', () =>
+            expect(fromArrayBuffer(toArrayBuffer(big, {utf8: false}), {utf8: false}))
+                .toStrictEqual(big));
+        });
+});
+
+describe('Convenience functions', () => {
+    describe('file', () => {
+        const simple = file('simple', 'data1');
+        test('simple is array', () =>
+            expect(simple.constructor)
+                .toBe(Array));
+        test('simple length', () =>
+            expect(simple.length)
+                .toBe(1));
+
+        test('simple content', () =>
+            expect(simple[0])
+                .toBeInstanceOf(AFile));
+
+        test('simple meta', () =>
+            expect(simple[0][METADATA])
+                .toStrictEqual({name: 'simple', contentType: 'text/plain'}));
+
+        const withMetadata = file('withMetadata', 'data2', {date: 'now'}, 'myLabel');
+
+        test('withMetadata', () =>
+            expect(withMetadata[METADATA])
+                .toStrictEqual({
+                    name: 'withMetadata',
+                    contentType: 'text/plain',
+                    date: 'now'
+                }));
+
+        test('withMetadata file no numeric version', () =>
+            expect(withMetadata[0])
+                .toBe(undefined));
+
+
+        test('withMetadata label', () =>
+            expect(withMetadata[TAGS]?.['myLabel'][METADATA])
+                .toStrictEqual({
+                    name: 'withMetadata',
+                    contentType: 'text/plain',
+                    date: 'now'
+                }));
+
+        const noMetadata = file('noMetadata', 'data3', 2, 'myLabel');
+
+        test('noMetadata', () =>
+            expect(noMetadata[METADATA])
+                .toStrictEqual({
+                    name: 'noMetadata',
+                    contentType: 'text/plain'
+                }));
+
+        test('noMetadata 1', () =>
+                expect(noMetadata[1])
+                    .toBeInstanceOf(AFile));
+
+        test('noMetadata myLabel', () =>
+            expect(noMetadata[TAGS]?.['myLabel'])
+                .toBeInstanceOf(AFile));
+
+        test('noMetadata 0', () =>
+            expect(withMetadata[0])
+                .toBe(undefined));
     });
 });

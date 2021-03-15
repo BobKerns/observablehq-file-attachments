@@ -105,7 +105,6 @@ const canonicalizeVersion = (version: Version | null | undefined, length: number
         // Tag
         return version;
     }
-    if (length === 0) return null;
     version = version ?? -1;
     if (version === 0) {
         // The initial state is no file.
@@ -113,7 +112,9 @@ const canonicalizeVersion = (version: Version | null | undefined, length: number
     }
     // Negative versions count from most recent.
     return version < 0
-        ? length + version
+        ? length + version < 0
+            ? null
+            : length + version
         : version - 1;
 }
 
@@ -141,7 +142,7 @@ export const getVersion = (files: Files, version: Version): VFile | null => {
  * @returns a [[Files]] array.
  */
 export const versions = (file: AFile, ...versionList: Version[]) => {
-    if (versions.length === 0) {
+    if (versionList.length === 0) {
         versionList = [1];
     }
     const files: Files = [];
@@ -179,15 +180,18 @@ export function file(name: string, data: any, metadata?: Partial<Metadata>|Versi
     if (!metadata) {
         const mData = {name};
         const file = new AFile(name, data);
-        return meta(versions(file, ...versionList), mData)
+        const meta2 = {...mData, ...(file[METADATA] ?? {})};
+        return meta(versions(file, ...versionList), meta2)
     } if (typeof metadata === 'string' || typeof metadata === 'number') {
         const mData = {name};
         const file = new AFile(name, data);
-        return meta(versions(file, metadata, ...versionList), mData)
+        const meta2 = {...mData, ...(file[METADATA] ?? {})};
+        return meta(versions(file, metadata, ...versionList), meta2)
     } else {
         const mData = {name, ...(metadata ?? {})};
         const file = new AFile(name, data, metadata);
-        return meta(versions(file, ...versionList), mData);
+        const meta2 = {...mData, ...(file[METADATA] ?? {})};
+        return meta(versions(file, ...versionList), meta2);
     }
 };
 
@@ -276,8 +280,8 @@ export const deleteVersion = (files: Files, version: Version): void => {
 };
 
 /**
- * Encode a string into an ArrayBuffer.
- * @param s The string to be encoded
+ * Encode a `string` into an `ArrayBuffer`.
+ * @param s The `string` to be encoded
  * @returns An `ArrayBuffer` with the string data as UTF-16
  */
 export const encodeString16 = (s: string) => {
@@ -289,13 +293,29 @@ export const encodeString16 = (s: string) => {
     return ab;
   };
 
+/**
+ * Convert a `string` to an `ArrayBuffer`, in either UTF8 or UTF16 formats.
+ * @param s
+ * @param param1
+ * @returns an `ArrayBuffer` with the `string`'s content in the requested format.
+ */
 export const toArrayBuffer = (s: string, {utf8 = true}: DataOptions = {utf8: true}) => {
     if (utf8) {
         return new TextEncoder().encode(s).buffer
     } else {
         return encodeString16(s);
     }
-}
+};
+
+/**
+ * Convert an `ArrayBuffer` to a `string`.
+ * @param ab An `ArrayBuffer`
+ * @param param1
+ * @returns the string
+ */
+export const fromArrayBuffer = (ab: ArrayBuffer, {utf8 = true}: DataOptions = {utf8: true}) => {
+    return new TextDecoder(utf8 ? 'utf-8' : 'utf-16').decode(ab);
+};
 
 /**
  * Associate a _metadata_ object with the specified file (or array of file
