@@ -34,7 +34,7 @@ const visualizer = (opts?: Partial<VisualizerOptions>) => {
 const mode = process.env.NODE_ENV;
 // noinspection JSUnusedLocalSymbols
 const dev = mode === 'development';
-const serve_mode = process.env.SERVE && dev;
+const serve_mode = dev && process.env.SERVE && Number.parseInt(process.env.SERVE) || false;
 const serve_doc = process.env.SERVE_DOC && serve_mode;
 
 const git_revision = execFileSync('git', ['show-ref', '--head', '--verify', '-s', 'HEAD'],
@@ -166,7 +166,7 @@ const options: RollupOptions = {
             serve({
                 open: !!serve_doc,
                 verbose: true,
-                port: 5000,
+                port: serve_mode,
                 contentBase: '',
                 openPage: '/docs/api/index.html'
             })
