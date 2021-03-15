@@ -22,7 +22,7 @@
 		"hiro-sun.vscode-emacs",
 		"bierner.github-markdown-preview",
 		"eamodio.gitlens",
-		"orta.vscode-jest"
+		"kavod-io.vscode-jest-test-adapter"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
