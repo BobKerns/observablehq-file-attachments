@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ObservableHQ FileAttachment Virtual Filesystem</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body, [{left: '$`', right: '`$', display: false},{left: '$$', right: '$$', display: true},{left: '\(', right: '\)', display: false},{left: '\[', right: '\]', display: true}]);"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.0.3/styles/xcode.css" integrity="sha256-OI7B0pICACICPVbs30FdQ/l6qL8TnsfhyGAdg5m5NzQ=" crossorigin="anonymous">
+</head>
+<body><h1 id="project-observablehq-fileattachment-virtual-filesystem">Project ObservableHQ FileAttachment Virtual Filesystem</h1>
+<p>For full documentation, please see:</p>
+<ul>
+<li>The <a href=https://bobkerns.github.io/observablehq-file-attachments/ >Documentation Site</a>.</li>
+<li>The <a href=https://bobkerns.github.io/observablehq-file-attachments/docs/ >Release Documentation Site</a>.</li>
+</ul>
+<p>This provides more flexibility for working with <a href=https://observablehq.com >ObservableHQ&#39;s</a> <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> objects, by placing them in a virtual directory structure. Generated and static data exist side-by-side.</p>
+<p>This addresses several issues with <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a>.</p>
+<ul>
+<li>You can&#39;t compute what attachment to use. The string argument must be a literal.</li>
+<li>The namespace is flat. This imposes a lack of organization; it would be compounded were we able to compute what attachment to reference.</li>
+<li>I need to be able to switch between a computed value and a value loaded from an attachment. Often, my attachments are cached computations that start with loading external data. I need to be able to easily recompute them without changing the code that references them.</li>
+<li>Being able to prototype a potential <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> in-notebook would be very handy.<ul>
+<li>This could include filtering or altering existing sources.</li>
+</ul>
+</li>
+<li>It should be easier to switch between versions, and tagging/labeling versions would be a big help.</li>
+<li>It should be easier to track what attachments and versions are in use in old revisions. Replacing an old version with a new in the current notebook clutters up the set of unused attachments, cluttering up &quot;unused&quot; with &quot;obsolete&quot;.</li>
+<li>No metadata is associated with <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> instances. `Content-length`, `Content-type`, and `last-modified` are particularly useful, and are obtained by this code. In addition, the ${meta_link} operation can be used to attach metadata to files.</li>
+<li>I want to be able to request information, corresponding to resources on the net, that I optionally can substitute a <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a>.</li>
+</ul>
+<p>By indirecting through a constructed directory, <a href=#AFileSystem >AFileSystem</a>, these shortcomings can be mitigated. The cost, of course, is a bit of extra setup.</p>
+<p>Virtualization also allows for supplying alternate sources for the data, and dynamic updates to the data. The AsyncGenerator paradigm is used to allow dynamic updates while allowing proper updating of dependencies.</p>
+<h1 id="features">Features</h1>
+<ul>
+<li>The ability to organize data sources hierarchically.</li>
+<li>Generated data can be accessed via the <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> API for compatibility, serialized or deserialized as needed</li>
+<li>The ability to freely switch between computed data and data cached as a <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a>.</li>
+<li>The ability to store any type of data without needing to parse it at point-of-use.</li>
+<li>Contents can be updated on on the fly.</li>
+<li>The reactive control flow is preserved through the use of async generators.</li>
+<li>Implements a versioned, tagged filesystem, facilitating comparing different versions of the same data.</li>
+<li>Provides for discovered data; directories can be populated on-demand.</li>
+<li>Works smoothly with ObservableHQ&#39;s attachment usage tracking and renumbering on reupload.</li>
+</ul>
+<h1 id="usage">Usage</h1>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { AFileSystem, AFile} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@bobkerns/file-attachments&#x27;</span>
+
+F = <span class="hljs-keyword">new</span> AFileSystem(
+    {
+        <span class="hljs-attr">data</span>: {
+            <span class="hljs-comment">// Arrays denote file versions.</span>
+            <span class="hljs-attr">table1</span>: [
+                FileAttachment(<span class="hljs-string">&#x27;Table1.json&#x27;</span>),
+                FileAttachment(<span class="hljs-string">&#x27;Table1.json@2&#x27;</span>)
+            ],
+            <span class="hljs-attr">table2</span>: [AFile(<span class="hljs-string">&#x27;table2&#x27;</span>, {<span class="hljs-attr">data</span>: [[<span class="hljs-number">1</span>, <span class="hljs-number">5</span>, <span class="hljs-number">3</span>] [<span class="hljs-number">2</span>, <span class="hljs-number">6</span>, <span class="hljs-number">4</span>]]})]
+        },
+        <span class="hljs-attr">test</span>: {
+            <span class="hljs-attr">table1</span>: [FileAttachment(<span class="hljs-string">&#x27;Table1-test.json&#x27;</span>)]
+        }
+    }
+  });
+<span class="hljs-comment">// Make table2 appear in the /test directory as well.</span>
+F.copy(<span class="hljs-string">&#x27;/data/table2&#x27;</span>, <span class="hljs-string">&#x27;/test/table2&#x27;</span>); <span class="hljs-comment">// Perhaps more like a hard link</span>
+<span class="hljs-comment">// Label Version 2 of /data/table1 as &#x27;release&#x27;</span>
+<span class="hljs-comment">// It can then be referenced as /label/table1@release, even if additional</span>
+<span class="hljs-comment">// versions are added later.</span>
+F.label(<span class="hljs-string">&#x27;/data/table1@2&#x27;</span>, <span class="hljs-string">&#x27;release&#x27;</span>);
+
+<span class="hljs-comment">// The notebook awaits</span>
+TABLE1 = F.find(<span class="hljs-string">&#x27;/data/table1&#x27;</span>).json();
+
+<span class="hljs-comment">// Doesn&#x27;t exist, so returns undefined</span>
+NO_FILE = F.find(<span class="hljs-string">&#x27;/noFile&#x27;</span>).json();
+
+<span class="hljs-comment">// To get an error if the file doesn&#x27;t exist:</span>
+ERROR_FILE = F.find(<span class="hljs-string">&#x27;/noFile&#x27;</span>).exists.json();
+
+<span class="hljs-comment">// To get a file, once it is available</span>
+AWAIT_FILE = F.waitFor(<span class="hljs-string">&#x27;/notYet&#x27;</span>).json();
+
+<span class="hljs-comment">// To add a file:</span>
+F.add(<span class="hljs-string">&#x27;/notYet&#x27;</span>, <span class="hljs-keyword">new</span> AFile(<span class="hljs-string">&#x27;notYet&#x27;</span>, {<span class="hljs-attr">Some</span>: <span class="hljs-string">&#x27;data&#x27;</span>}));
+
+<span class="hljs-comment">// To get a file&#x27;s data when added and receive updates.</span>
+UPDATED_FILE = F.watch(<span class="hljs-string">&#x27;/updatedFile&#x27;</span>).json();
+
+<span class="hljs-comment">// Add some updates.</span>
+{
+    <span class="hljs-keyword">for</span> (i <span class="hljs-keyword">in</span> range(<span class="hljs-number">0</span>, <span class="hljs-number">10</span>)) {
+        <span class="hljs-keyword">await</span> sleep(<span class="hljs-number">1000</span>);
+        F.add(<span class="hljs-string">&#x27;/updatedFile&#x27;</span>, <span class="hljs-keyword">new</span> AFile(<span class="hljs-string">&#x27;/updatedFile&#x27;</span>, {<span class="hljs-attr">data</span>: i}));
+    }
+}
+
+<span class="hljs-comment">// Metadata</span>
+METADATA_TABLE1 = F.metadata(<span class="hljs-string">&#x27;/test/table2&#x27;</span>);
+</code></pre>
+<h3 id="afilesystem">AFileSystem</h3>
+<p>The <code>AFileSystem</code> constructor takes a single argument, which represents an initial filesystem content. Every Object (not subclasses, but literal objects) represent a directory, while every array holds the versions of a logical file.</p>
+<p>Versions are specified on lookup by appending <code>@version</code> to the path. No version specified is the same as <code>@latest</code>, which obtains the highest numbered version (the last in the array). You can ignore named versions (labels), or even multiple versions, but files are always identified by being in an array.</p>
+<p>A file can be any value, but normally they will be either an <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> or an <a href=#AFile >AFile</a>; they implement the same interface</p>
+<p>Implementation: <a href=src/AFileSystem.ts >AFileAFileSystem,</a></p>
+<h3 id="class-afile">class <code>AFile</code></h3>
+<p><code>new AFile(</code><em>name</em>, <em>data</em>, <em>metadata</em><code>)</code></p>
+<p>This implements the same interface as <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a>, but works with supplied data in a variety of forms:</p>
+<ul>
+<li>String—depending on the type requested, this may involve parsing or converting to an ArrayBuffer, Blob, or ReadableStream. <em>options</em> arguments to the various extractors can include <code>{utf8: _false_}</code> to use UTF16 rather than UTF8 encoding.</li>
+<li>ArrayBuffer</li>
+<li>ReadableStream</li>
+<li>Blob</li>
+<li>JSON-compatible objects</li>
+<li>Arrays such as would be returned from <code>.csv()</code> or <code>.tsv()</code>. Non-arrays will be converted to strings and parsed.</li>
+<li>A function. returning the value or a promise to the value. This is the most useful form, as it defers computation until needed. For example, it can be used to dynamically fetch data using <code>fetch</code>. Except in the case of a <code>ReadableStream</code>, the result is cached. The function is called with the following arguments:<ul>
+<li><em>file</em>: the <a href=#AFile >AFile</a>.</li>
+<li><em>method</em>: One of <code>json</code>, <code>text</code>. <code>arrayBuffer</code>, <code>stream</code>, <code>url</code>, <code>csv</code>, <code>tsv</code>. These indicate how the data will be used, allowing the function to choose how to represent it. the usual conversions will be applied as needed, however, so it may be safely ignored.</li>
+<li><em>options</em>: The options supplied to the method accessing the data.</li>
+</ul>
+</li>
+<li>Arbitrary data not described above, which can be retrieved unchanged via the <code>.json()</code> method</li>
+<li>A <code>Promise</code> that resolves to any of the above.</li>
+</ul>
+<p><em>metadata</em> is either an object with metadata to be combined, or a string, which is interpreted as the <code>contentType</code>, as a shorthand when that is the only metadata being supplied.</p>
+<p>All operations are asynchronous.</p>
+<p>Implementation: <a href=src/AFile.ts >AFile</a></p>
+<h3 id="function-metafile-metadata">function meta(<em>file</em>, <em>metadata</em>)</h3>
+<p>Associate a <em>metadata</em> object with the specified file (or array of file versions). This is normally used to annotate entries in the <a href=https://observablehq.com/@observablehq/file-attachments >FileAttachment</a> tree.</p>
+<p>Implmentation: <a href=src/util.ts >versionedFile</a></p>
+<h3 id="function-versionedfileversion-file">function versionedFile(<em>version</em>, <em>file</em>)</h3>
+<p>Convenience function that returns an array with the <em>file</em> version. If <em>version</em> is -1 or falsey, returns <code>[</code><em>file</em><code>]</code>.</p>
+<p>Implmentation: <a href=src/util.ts >versionedFile</a></p>
+<h1 id="content">Content</h1>
+<h2 id="primary-organization">Primary organization</h2>
+<p>The important files are the outputs included in the published module, and the sources that
+produce them. The rest are supporting mechanisms.</p>
+<ul>
+<li><code>src/</code> contains the source code for the library.<br/></li>
+<li><code>src/__tests__</code> contains the tests<br/></li>
+<li><code>notebook/</code> contains the corresponding <a href=notebook/index.html >ObservableHQ notebook</a>. Currently, this is the original code; it will be changed to import this library and demonstrate is usage once this version is working and tested.</li>
+</ul>
+<p>The <a href=https://observablehq.com/@bobkerns/file-attachments >current version of the notebook</a> can be found at the site.</p>
+<p>The local version can be viewed by running the script <code>npm run serve</code> and <a href=http://localhost:5111/notebook/index.html >accessing it via that server on port 5111</a></p>
+<h2 id="packagejson">package.json</h2>
+<h2 id="continuous-integration">Continuous Integration</h2>
+<p>Three free Continuous Integration workflows are configured out of the box.  Remove any you
+you do not need, or disable them in the relevant service.</p>
+<p>You probably do not need multiple builds on multiple services, but this will let you see each and make a choice. For simple things at least, the features are very similar. It is very useful to be able to build and test on multiple environments in parallel, something each of the services provides.</p>
+<ul>
+<li><a href=https://circleci.com >Circle CI</a></li>
+<li><a href=https://travis-ci.com >Travis CI</a></li>
+<li><a href=https://github.com >GitHub Workflows (CI)</a></li>
+</ul>
+</body>
+</html>
